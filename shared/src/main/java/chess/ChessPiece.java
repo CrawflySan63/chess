@@ -98,18 +98,16 @@ public class ChessPiece {
                 int row = startRow + dir[0];
                 int col = startCol + dir[1];
 
-                while (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
+                if (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
                     ChessPosition newPos = new ChessPosition(row, col);
                     ChessPiece occupant = board.getPiece(newPos);
 
                     if (occupant == null) {
                         moves.add(new ChessMove(myPosition, newPos, null));
-                        break;
                     } else {
                         if (occupant.getTeamColor() != this.getTeamColor()) {
                             moves.add(new ChessMove(myPosition, newPos, null));
                         }
-                        break;
                     }
                 }
             }
