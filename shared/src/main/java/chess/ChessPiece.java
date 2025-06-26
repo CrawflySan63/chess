@@ -154,6 +154,27 @@ public class ChessPiece {
                 }
             }
 
+            for (int colOffset : new int[] {-1, 1}) {
+                int targetCol = startCol + colOffset;
+                int targetRow = startRow + direction;
+
+                if (targetCol >= 1 && targetCol <= 8 && targetRow >= 1 && targetRow <= 8) {
+                    ChessPosition diagPos = new ChessPosition(targetRow, targetCol);
+                    ChessPiece target = board.getPiece(diagPos);
+
+                    if (target != null && target.getTeamColor() != this.getTeamColor()) {
+                        // Promotion with capture
+                        if (targetRow == promotionRank) {
+                            for (PieceType promoteTo : new PieceType[] {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT}) {
+                                moves.add(new ChessMove(myPosition, diagPos, promoteTo));
+                            }
+                        } else {
+                            moves.add(new ChessMove(myPosition, diagPos, null));
+                        }
+                    }
+                }
+            }
+
         } else if (type == PieceType.ROOK) {
             int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
