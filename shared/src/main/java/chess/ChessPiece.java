@@ -164,6 +164,32 @@ public class ChessPiece {
                     col += dir[1];
                 }
             }
+        } else if (type == PieceType.QUEEN) {
+            int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+
+            int startRow = myPosition.getRow();
+            int startCol = myPosition.getColumn();
+
+            for (int[] dir: directions) {
+                int row = startRow + dir[0];
+                int col = startCol + dir[1];
+
+                while (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
+                    ChessPosition newPos = new ChessPosition(row, col);
+                    ChessPiece occupant = board.getPiece(newPos);
+
+                    if (occupant == null) {
+                        moves.add(new ChessMove(myPosition, newPos, null));
+                    } else {
+                        if (occupant.getTeamColor() != this.getTeamColor()) {
+                            moves.add(new ChessMove(myPosition, newPos, null));
+                        }
+                        break;
+                    }
+                    row += dir[0];
+                    col += dir[1];
+                }
+            }
         }
         return moves;
     }
