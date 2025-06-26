@@ -129,15 +129,31 @@ public class ChessPiece {
                 }
             }
         } else if (type == PieceType.PAWN) {
-
             int startRow = myPosition.getRow();
             int startCol = myPosition.getColumn();
 
-            if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                int [][] directions = {{1, 0}, {1, 1}, {1, -1}, {2, 0}};
-            } else if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                int[][] directions = {{-1, 0}, {-1, -1}, {-1, 1}, {-2, 0}};
+            int direction = (this.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
+            int startRank = (this.getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
+            int promotionRank = (this.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
+
+            ChessPosition oneStep = new ChessPosition(startRow + direction, startCol);
+            if (board.getPiece(oneStep) == null && oneStep.getRow() >= 1 && oneStep.getRow() <= 8) {
+                if (oneStep.getRow() == promotionRank) {
+                    for (PieceType promoteTo : new PieceType[] {PieceType.QUEEN, PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP}) {
+                        moves.add(new ChessMove(myPosition, oneStep, promoteTo));
+                    }
+                } else {
+                    moves.add(new ChessMove(myPosition, oneStep, null));
+                }
+
+                if (startRow == startRank) {
+                    ChessPosition twoStep = new ChessPosition(startRow + 2 * direction, startCol);
+                    if (board.getPiece(twoStep) == null) {
+                        moves.add(new ChessMove(myPosition, twoStep, null));
+                    }
+                }
             }
+
         } else if (type == PieceType.ROOK) {
             int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
