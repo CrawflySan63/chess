@@ -52,11 +52,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //Do I need if else statements saying "If Bishop, then piece can move this certain way...if Queen, then it can move this way" etc.?
-        //if(getPieceType = Bishop)
-            //then return all diagonal squares from starting position until edge of board
-        //else if(getPieceType = Queen
-            //then return all diagonal and orthogonal squares until edge of board
         Collection<ChessMove> moves = new ArrayList<>();
 
         PieceType type = getPieceType();
@@ -131,6 +126,42 @@ public class ChessPiece {
                             moves.add(new ChessMove(myPosition, newPos, null));
                         }
                     }
+                }
+            }
+        } else if (type == PieceType.PAWN) {
+
+            int startRow = myPosition.getRow();
+            int startCol = myPosition.getColumn();
+
+            if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                int [][] directions = {{1, 0}, {1, 1}, {1, -1}, {2, 0}};
+            } else if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                int[][] directions = {{-1, 0}, {-1, -1}, {-1, 1}, {-2, 0}};
+            }
+        } else if (type == PieceType.ROOK) {
+            int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+
+            int startRow = myPosition.getRow();
+            int startCol = myPosition.getColumn();
+
+            for (int[] dir: directions) {
+                int row = startRow + dir[0];
+                int col = startCol + dir[1];
+
+                while (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
+                    ChessPosition newPos = new ChessPosition(row, col);
+                    ChessPiece occupant = board.getPiece(newPos);
+
+                    if (occupant == null) {
+                        moves.add(new ChessMove(myPosition, newPos, null));
+                    } else {
+                        if (occupant.getTeamColor() != this.getTeamColor()) {
+                            moves.add(new ChessMove(myPosition, newPos, null));
+                        }
+                        break;
+                    }
+                    row += dir[0];
+                    col += dir[1];
                 }
             }
         }
