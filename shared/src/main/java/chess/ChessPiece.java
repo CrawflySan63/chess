@@ -157,7 +157,7 @@ public class ChessPiece {
             for (int colOffset : new int[] {-1, 1}) {
                 int targetCol = startCol + colOffset;
                 int targetRow = startRow + direction;
-
+//test
                 if (targetCol >= 1 && targetCol <= 8 && targetRow >= 1 && targetRow <= 8) {
                     ChessPosition diagPos = new ChessPosition(targetRow, targetCol);
                     ChessPiece target = board.getPiece(diagPos);
