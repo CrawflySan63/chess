@@ -58,6 +58,34 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
-    public void resetBoard() { throw new RuntimeException("Not implemented");
+    public void resetBoard() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                squares[row][col] = null;
+            }
+        }
+
+        ChessPiece.PieceType[] backRow = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK
+        };
+
+        // Place white pieces
+        for (int col = 0; col < 8; col++) {
+            addPiece(new ChessPosition(1, col + 1), new ChessPiece(ChessGame.TeamColor.WHITE, backRow[col]));
+            addPiece(new ChessPosition(2, col + 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        }
+
+        // Place black pieces
+        for (int col = 0; col < 8; col++) {
+            addPiece(new ChessPosition(8, col + 1), new ChessPiece(ChessGame.TeamColor.BLACK, backRow[col]));
+            addPiece(new ChessPosition(7, col + 1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        }
     }
 }
