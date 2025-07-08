@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -18,6 +19,23 @@ public class ChessGame {
         this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && currentTurn == chessGame.currentTurn;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, currentTurn);
     }
 
     /**
@@ -76,7 +94,25 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition start = move.getStartPosition();
+        ChessPiece pieceToMove = board.getPiece(start);
+
+        if (pieceToMove == null) {
+            throw new InvalidMoveException();
+        }
+
+        if (pieceToMove.getTeamColor() != currentTurn) {
+            throw new InvalidMoveException();
+        }
+
+        Collection<ChessMove> valid = validMoves(start);
+        if (valid == null || !valid.contains(move)) {
+            throw new InvalidMoveException();
+        }
+
+        applyMove(board, move);
+        currentTurn = (currentTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
     }
 
     /**
