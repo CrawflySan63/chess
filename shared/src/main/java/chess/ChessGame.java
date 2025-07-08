@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -96,16 +93,18 @@ public class ChessGame {
             baseMoves.addAll(getCastlingMoves(piece, startPosition));
         }
 
-        Collection<ChessMove> valid = new ArrayList<>();
+        Set<ChessMove> valid = new HashSet<>();
 
         for (ChessMove move : baseMoves) {
             ChessBoard copy = deepCopyBoard(board);
             applyMove(copy, move);
 
             if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                ChessPosition enemyKingPos = findEnemyKing(copy, piece.getTeamColor());
-                if (enemyKingPos != null && moveAdjacentTo(move.getEndPosition(), enemyKingPos)) {
-                    continue;  // skip this move
+                ChessPosition newKingPos = move.getEndPosition();
+                ChessPosition enemyKingPos = findEnemyKing(copy, piece.getTeamColor());  // search on updated board
+
+                if (enemyKingPos != null && moveAdjacentTo(newKingPos, enemyKingPos)) {
+                    continue;  // skip if kings would be adjacent after move
                 }
             }
 
@@ -273,6 +272,15 @@ public class ChessGame {
 
     private Collection<ChessMove> getCastlingMoves(ChessPiece kingPiece, ChessPosition kingPos) {
         Collection<ChessMove> castlingMoves= new ArrayList<>();
+
+        if (kingPiece.getTeamColor() == TeamColor.WHITE &&
+                (kingPos.getRow() != 1 || kingPos.getColumn() != 5)) {
+            return castlingMoves;
+        }
+        if (kingPiece.getTeamColor() == TeamColor.BLACK &&
+                (kingPos.getRow() != 8 || kingPos.getColumn() != 5)) {
+            return castlingMoves;
+        }
         if (kingPiece.getTeamColor() == TeamColor.WHITE) {
             //make sure king hasn't moved
             //make sure rooks haven't moved

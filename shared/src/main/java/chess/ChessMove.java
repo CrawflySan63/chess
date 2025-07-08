@@ -44,6 +44,11 @@ public class ChessMove {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 
+    @Override
+    public String toString() {
+        return "(" + startPosition.getRow() + "," + startPosition.getColumn() + ") → (" + endPosition.getRow() + "," + endPosition.getColumn() + ")";
+    }
+
     /**
      * @return ChessPosition of ending location
      */
