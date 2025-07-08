@@ -175,7 +175,6 @@ public class ChessPiece {
                     }
                 }
             }
-
         } else if (type == PieceType.ROOK) {
             int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 

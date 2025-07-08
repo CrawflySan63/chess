@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor currentTurn;
+    private ChessMove lastMove;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -73,10 +75,16 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) return null;
 
-        Collection<ChessMove> allMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> baseMoves = piece.pieceMoves(board, startPosition);
+
+        //if Pawn, add possible en passant moves
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            baseMoves = addSpecialPawnMoves(piece, startPosition, baseMoves);
+        }
+
         Collection<ChessMove> valid = new ArrayList<>();
 
-        for (ChessMove move : allMoves) {
+        for (ChessMove move : baseMoves) {
             ChessBoard copy = deepCopyBoard(board);
             applyMove(copy, move);
             if (!isInCheckOnBoard(copy, piece.getTeamColor())) {
@@ -111,6 +119,7 @@ public class ChessGame {
         }
 
         applyMove(board, move);
+        lastMove = move; //updates lastMove so that on the subsequent move, checking for en Passant capability is available
         currentTurn = (currentTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
     }
@@ -194,6 +203,38 @@ public class ChessGame {
         return board;
     }
 
+    private Collection<ChessMove> addSpecialPawnMoves(ChessPiece piece, ChessPosition position, Collection<ChessMove> baseMoves) {
+        List<ChessMove> updatedMoves = new ArrayList<>(baseMoves);
+
+        int startRow = position.getRow();
+        int startCol = position.getColumn();
+        int direction = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : -1;
+
+        //Logic for En Passant
+        int enPassantRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 5 : 4;
+        if (startRow == enPassantRow && lastMove != null) {
+            ChessPiece lastMovedPiece = board.getPiece(lastMove.getEndPosition());
+            if (lastMovedPiece != null &&
+                    lastMovedPiece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                    lastMovedPiece.getTeamColor() != piece.getTeamColor()) {
+
+                int fromRow = lastMove.getStartPosition().getRow();
+                int toRow = lastMove.getEndPosition().getRow();
+
+                if (Math.abs(fromRow - toRow) == 2 &&
+                        Math.abs(lastMove.getEndPosition().getColumn() - startCol) == 1) {
+
+                    int captureRow = startRow + direction;
+                    int captureCol = lastMove.getEndPosition().getColumn();
+                    ChessPosition capturePos = new ChessPosition(captureRow, captureCol);
+                    updatedMoves.add(new ChessMove(position, capturePos, null));
+                }
+            }
+        }
+
+        return updatedMoves;
+    }
+
     private boolean isInCheckOnBoard(ChessBoard boardToTest, TeamColor teamColor) {
         // Find the king’s position
         ChessPosition kingPos = null;
@@ -254,6 +295,15 @@ public class ChessGame {
         ChessPosition end = move.getEndPosition();
 
         ChessPiece pieceToMove = board.getPiece(start);
+
+        if (pieceToMove.getPieceType() == ChessPiece.PieceType.PAWN &&
+            board.getPiece(end) == null &&
+            start.getColumn() != end.getColumn()) {
+
+            int capturedPawnRow = (pieceToMove.getTeamColor() == TeamColor.WHITE) ? end.getRow() - 1 : end.getRow() + 1;
+            ChessPosition capturedPos = new ChessPosition(capturedPawnRow, end.getColumn());
+            board.addPiece(capturedPos, null);
+        }
 
         board.addPiece(start, null);
 
