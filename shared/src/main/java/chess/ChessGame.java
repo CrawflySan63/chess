@@ -16,6 +16,15 @@ public class ChessGame {
     private TeamColor currentTurn;
     private ChessMove lastMove;
 
+    private boolean whiteKingMoved = false;
+    private boolean blackKingMoved = false;
+
+    private boolean whiteQueenRookMoved = false;  // a1 rook
+    private boolean whiteKingRookMoved = false;   // h1 rook
+
+    private boolean blackQueenRookMoved = false;  // a8 rook
+    private boolean blackKingRookMoved = false;   // h8 rook
+
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
@@ -82,11 +91,24 @@ public class ChessGame {
             baseMoves = addSpecialPawnMoves(piece, startPosition, baseMoves);
         }
 
+        //if King add possible castling moves
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            baseMoves.addAll(getCastlingMoves(piece, startPosition));
+        }
+
         Collection<ChessMove> valid = new ArrayList<>();
 
         for (ChessMove move : baseMoves) {
             ChessBoard copy = deepCopyBoard(board);
             applyMove(copy, move);
+
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                ChessPosition enemyKingPos = findEnemyKing(copy, piece.getTeamColor());
+                if (enemyKingPos != null && moveAdjacentTo(move.getEndPosition(), enemyKingPos)) {
+                    continue;  // skip this move
+                }
+            }
+
             if (!isInCheckOnBoard(copy, piece.getTeamColor())) {
                 valid.add(move);
             }
@@ -116,6 +138,31 @@ public class ChessGame {
         Collection<ChessMove> valid = validMoves(start);
         if (valid == null || !valid.contains(move)) {
             throw new InvalidMoveException();
+        }
+
+        if (pieceToMove.getPieceType() == ChessPiece.PieceType.KING) {
+            if (pieceToMove.getTeamColor() == TeamColor.WHITE) {
+                whiteKingMoved = true;
+            } else {
+                blackKingMoved = true;
+            }
+        } else if (pieceToMove.getPieceType() == ChessPiece.PieceType.ROOK) {
+            int row = start.getRow();
+            int col = start.getColumn();
+
+            if (pieceToMove.getTeamColor() == TeamColor.WHITE) {
+                if (row == 1 && col == 1) {
+                    whiteQueenRookMoved = true;
+                }
+                if (row == 1 && col == 8) whiteKingRookMoved = true;
+            } else {
+                if (row == 8 && col == 1) {
+                    blackQueenRookMoved = true;
+                }
+                if (row == 8 && col == 8) {
+                    blackKingRookMoved = true;
+                }
+            }
         }
 
         applyMove(board, move);
@@ -201,6 +248,139 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    private ChessPosition findEnemyKing(ChessBoard board, TeamColor myColor) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+                if (piece != null &&
+                        piece.getPieceType() == ChessPiece.PieceType.KING &&
+                        piece.getTeamColor() != myColor) {
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean moveAdjacentTo(ChessPosition a, ChessPosition b) {
+        int row_diff = Math.abs(a.getRow() - b.getRow());
+        int col_diff = Math.abs(a.getColumn() - b.getColumn());
+        return row_diff <= 1 && col_diff <= 1;
+    }
+
+    private Collection<ChessMove> getCastlingMoves(ChessPiece kingPiece, ChessPosition kingPos) {
+        Collection<ChessMove> castlingMoves= new ArrayList<>();
+        if (kingPiece.getTeamColor() == TeamColor.WHITE) {
+            //make sure king hasn't moved
+            //make sure rooks haven't moved
+            if (whiteKingMoved) return castlingMoves;
+            if (!whiteKingRookMoved) {
+                //make sure spaces between king and rook are empty
+                //make sure no spots are under attack
+                //if both of these things pass, add move to castlingMoves
+                if (board.getPiece(new ChessPosition(1, 6)) == null &&
+                        board.getPiece(new ChessPosition(1, 7)) == null) {
+
+                    boolean safe = true;
+                    for (int col : new int[]{5, 6, 7}) {
+                        ChessBoard testBoard = deepCopyBoard(board);
+                        ChessPosition from = kingPos; // previous square
+                        ChessPosition to = new ChessPosition(1, col);
+                        applyMove(testBoard, new ChessMove(from, to, null));
+                        if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
+                            safe = false;
+                            break;
+                        }
+                    }
+
+                    if (safe) {
+                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(1, 7), null));
+                    }
+                }
+            }
+            if (!whiteQueenRookMoved) {
+                //make sure spaces between king and rook are empty
+                //make sure no spots are under attack
+                //if both of these things pass, add move to castlingMoves
+                if (board.getPiece(new ChessPosition(1, 4)) == null &&
+                        board.getPiece(new ChessPosition(1, 3)) == null &&
+                        board.getPiece(new ChessPosition(1, 2)) == null) {
+
+                    boolean safe = true;
+                    for (int col : new int[]{5, 4, 3}) {
+                        ChessBoard testBoard = deepCopyBoard(board);
+                        ChessPosition from = kingPos; // previous square
+                        ChessPosition to = new ChessPosition(1, col);
+                        applyMove(testBoard, new ChessMove(from, to, null));
+                        if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
+                            safe = false;
+                            break;
+                        }
+                    }
+
+                    if (safe) {
+                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(1, 3), null));
+                    }
+                }
+            }
+        }
+        if (kingPiece.getTeamColor() == TeamColor.BLACK) {
+            if (blackKingMoved) return castlingMoves;
+            if (!blackKingRookMoved) {
+                //make sure spaces between king and rook are empty
+                //make sure no spots are under attack
+                //if both of these things pass, add move to castlingMoves
+                if (board.getPiece(new ChessPosition(8, 6)) == null &&
+                        board.getPiece(new ChessPosition(8, 7)) == null) {
+
+                    boolean safe = true;
+                    for (int col : new int[]{5, 6, 7}) {
+                        ChessBoard testBoard = deepCopyBoard(board);
+                        ChessPosition from = kingPos; // previous square
+                        ChessPosition to = new ChessPosition(8, col);
+                        applyMove(testBoard, new ChessMove(from, to, null));
+                        if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
+                            safe = false;
+                            break;
+                        }
+                    }
+
+                    if (safe) {
+                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(8, 7), null));
+                    }
+                }
+            }
+            if (!blackQueenRookMoved) {
+                //make sure spaces between king and rook are empty
+                //make sure no spots are under attack
+                //if both of these things pass, add move to castlingMoves
+                if (board.getPiece(new ChessPosition(8, 3)) == null &&
+                        board.getPiece(new ChessPosition(8, 4)) == null &&
+                        board.getPiece(new ChessPosition(8, 2)) == null) {
+
+                    boolean safe = true;
+                    for (int col : new int[]{5, 4, 3}) {
+                        ChessBoard testBoard = deepCopyBoard(board);
+                        ChessPosition from = kingPos; // previous square
+                        ChessPosition to = new ChessPosition(8, col);
+                        applyMove(testBoard, new ChessMove(from, to, null));
+                        if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
+                            safe = false;
+                            break;
+                        }
+                    }
+
+                    if (safe) {
+                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(8, 3), null));
+                    }
+                }
+            }
+        }
+
+        return castlingMoves;
     }
 
     private Collection<ChessMove> addSpecialPawnMoves(ChessPiece piece, ChessPosition position, Collection<ChessMove> baseMoves) {
@@ -303,6 +483,42 @@ public class ChessGame {
             int capturedPawnRow = (pieceToMove.getTeamColor() == TeamColor.WHITE) ? end.getRow() - 1 : end.getRow() + 1;
             ChessPosition capturedPos = new ChessPosition(capturedPawnRow, end.getColumn());
             board.addPiece(capturedPos, null);
+        }
+
+        if (pieceToMove.getPieceType() == ChessPiece.PieceType.KING &&
+            start.getColumn() == 5) {
+            if (pieceToMove.getTeamColor() == TeamColor.WHITE && end.getColumn() == 3) {
+                //remove king at start, add king at end
+                board.addPiece(start, null);
+                board.addPiece(end, pieceToMove);
+                //remove rook at its start position, add rook where it should go
+                board.addPiece(new ChessPosition(1, 1), null);
+                board.addPiece(new ChessPosition(1, 4), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+            }
+            if (pieceToMove.getTeamColor() == TeamColor.WHITE && end.getColumn() == 7) {
+                //remove king at start, add king at end
+                board.addPiece(start, null);
+                board.addPiece(end, pieceToMove);
+                //remove rook at its start position, add rook where it should go
+                board.addPiece(new ChessPosition(1, 8), null);
+                board.addPiece(new ChessPosition(1, 6), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+            }
+            if (pieceToMove.getTeamColor() == TeamColor.BLACK && end.getColumn() == 3) {
+                //remove king at start, add king at end
+                board.addPiece(start, null);
+                board.addPiece(end, pieceToMove);
+                //remove rook at its start position, add rook where it should go
+                board.addPiece(new ChessPosition(8, 1), null);
+                board.addPiece(new ChessPosition(8, 4), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+            }
+            if (pieceToMove.getTeamColor() == TeamColor.BLACK && end.getColumn() == 7) {
+                //remove king at start, add king at end
+                board.addPiece(start, null);
+                board.addPiece(end, pieceToMove);
+                //remove rook at its start position, add rook where it should go
+                board.addPiece(new ChessPosition(8, 8), null);
+                board.addPiece(new ChessPosition(8, 6), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+            }
         }
 
         board.addPiece(start, null);
