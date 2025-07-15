@@ -1,6 +1,7 @@
 package server;
 
 import spark.*;
+import server.handler.ClearHandler;
 
 public class Server {
 
@@ -10,9 +11,10 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.delete("/db", new ClearHandler());
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        //Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
