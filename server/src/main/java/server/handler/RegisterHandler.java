@@ -8,7 +8,6 @@ import service.UserService;
 import request.RegisterRequest;
 import result.RegisterResult;
 import dataaccess.DataAccessException;
-import dataaccess.DataAccess;
 
 public class RegisterHandler implements Route {
     private final UserService userService;
