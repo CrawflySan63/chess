@@ -1,11 +1,9 @@
 package service;
 
-import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.RegisterRequest;
 import result.RegisterResult;
-import service.UserService;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import dataaccess.DataAccessException;
@@ -13,12 +11,11 @@ import dataaccess.DataAccessException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RegisterServiceTest {
-    private DataAccess dataAccess;
     private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
     }
 
@@ -45,9 +42,8 @@ public class RegisterServiceTest {
         RegisterRequest duplicateRequest = new RegisterRequest("user1", "newpass", "user1@example.com");
 
         //should throw a DataAccessException
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            userService.register(duplicateRequest);
-        });
+        DataAccessException exception = assertThrows(DataAccessException.class,
+                () -> userService.register(duplicateRequest));
 
         assertTrue(exception.getMessage().contains("already taken"));
     }
