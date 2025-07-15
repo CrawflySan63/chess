@@ -1,7 +1,6 @@
 package server.handler;
 
 import com.google.gson.Gson;
-import dataaccess.MemoryDataAccess;
 import spark.Request;
 import spark.Response;
 import spark.Route;
