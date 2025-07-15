@@ -37,9 +37,8 @@ public class LoginServiceTest {
     void login_wrongPassword_fails() {
         LoginRequest badRequest = new LoginRequest("testuser", "wrongpass");
 
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            userService.login(badRequest);
-        });
+        DataAccessException exception = assertThrows(DataAccessException.class,
+                () -> userService.login(badRequest));
 
         assertEquals("Error: unauthorized", exception.getMessage());
     }
