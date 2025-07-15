@@ -2,20 +2,25 @@ package server.handler;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import service.ClearService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import dataaccess.DataAccess;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClearHandler implements Route {
+    private final ClearService service;
+
+    public ClearHandler(DataAccess dataAccess) {
+        this.service = new ClearService(dataAccess);
+    }
+
     @Override
     public Object handle(Request req, Response res) {
         try {
-            ClearService service = new ClearService(new MemoryDataAccess());
             service.clear();
 
             res.status(200);

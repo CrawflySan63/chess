@@ -19,7 +19,7 @@ public class Server {
         UserService userService = new UserService(dataAccess);
 
         // Register your endpoints and handle exceptions here.
-        Spark.delete("/db", new ClearHandler());
+        Spark.delete("/db", new ClearHandler(dataAccess));
         Spark.post("/user", new RegisterHandler(userService));
         Spark.post("/session", new LoginHandler(userService));
 
