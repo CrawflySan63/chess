@@ -6,6 +6,8 @@ import model.AuthData;
 import model.UserData;
 import request.RegisterRequest;
 import result.RegisterResult;
+import request.LoginRequest;
+import result.LoginResult;
 
 import java.util.UUID;
 
@@ -40,5 +42,27 @@ public class UserService {
 
         // Step 5 return success
         return new RegisterResult(request.username(), authToken);
+    }
+
+    public LoginResult login(LoginRequest request) throws DataAccessException {
+        //step 1 validate input
+        if (request.username() == null || request.password() == null || request.username().isBlank() ||
+                request.password().isBlank()) {
+            throw new DataAccessException("Error: bad request");
+        }
+
+        //step 2 check if password is correct or user not found
+        UserData user = dataAccess.getUser(request.username());
+        if (user == null || !user.password().equals(request.password())) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+
+        //step 3 create and store auth token
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, request.username());
+        dataAccess.insertAuth(authData);
+
+        //step 4 return success
+        return new LoginResult(request.username(), authToken);
     }
 }
