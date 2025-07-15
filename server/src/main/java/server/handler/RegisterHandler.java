@@ -14,8 +14,8 @@ public class RegisterHandler implements Route {
     private final UserService userService;
     private final Gson gson = new Gson();
 
-    public RegisterHandler(DataAccess dataAccess) {
-        this.userService = new UserService(dataAccess);
+    public RegisterHandler(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
