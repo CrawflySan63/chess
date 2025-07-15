@@ -5,6 +5,9 @@ import model.*;
 public interface DataAccess {
     void clear() throws DataAccessException;
 
+    //deleteAuthToken used in LogoutService
+    void deleteAuth(String token) throws DataAccessException;
+
     // Insert methods
     void insertUser(UserData user) throws DataAccessException;
     void insertAuth(AuthData auth) throws DataAccessException;

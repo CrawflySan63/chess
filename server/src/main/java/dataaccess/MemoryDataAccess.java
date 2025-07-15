@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.*;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,14 @@ public class MemoryDataAccess implements DataAccess {
         users.clear();
         auths.clear();
         games.clear();
+    }
+
+    @Override
+    public void deleteAuth(String token) throws DataAccessException {
+        if (!auths.containsKey(token)) {
+            throw new DataAccessException("Auth token does not exist");
+        }
+        auths.remove(token);
     }
 
     @Override
