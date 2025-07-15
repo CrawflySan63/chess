@@ -9,10 +9,15 @@ import service.UserService;
 import request.RegisterRequest;
 import result.RegisterResult;
 import dataaccess.DataAccessException;
+import dataaccess.DataAccess;
 
 public class RegisterHandler implements Route {
-    private final UserService userService = new UserService(new MemoryDataAccess());
+    private final UserService userService;
     private final Gson gson = new Gson();
+
+    public RegisterHandler(DataAccess dataAccess) {
+        this.userService = new UserService(dataAccess);
+    }
 
     @Override
     public Object handle(Request req, Response res) throws Exception {
