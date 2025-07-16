@@ -1,10 +1,10 @@
 package dataaccess;
 
 import model.*;
-
-import javax.xml.crypto.Data;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class MemoryDataAccess implements DataAccess {
     private final Map<String, UserData> users = new HashMap<>();
@@ -24,6 +24,11 @@ public class MemoryDataAccess implements DataAccess {
             throw new DataAccessException("Auth token does not exist");
         }
         auths.remove(token);
+    }
+
+    @Override
+    public Collection<GameData> listGames() throws DataAccessException {
+        return games.values();
     }
 
     @Override
