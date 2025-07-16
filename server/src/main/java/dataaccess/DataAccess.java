@@ -10,6 +10,9 @@ public interface DataAccess {
     //deleteAuthToken used in LogoutService
     void deleteAuth(String token) throws DataAccessException;
 
+    //replaceGame used in GameService.joinGame() method
+    void replaceGame(GameData game) throws DataAccessException;
+
     //listGames used in GameService.java for the list games endpoint
     Collection<GameData> listGames() throws DataAccessException;
 

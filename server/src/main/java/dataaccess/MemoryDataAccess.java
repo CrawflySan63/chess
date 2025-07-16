@@ -27,6 +27,11 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
+    public void replaceGame(GameData game) throws DataAccessException {
+        games.put(game.gameID(), game);
+    }
+
+    @Override
     public Collection<GameData> listGames() throws DataAccessException {
         return games.values();
     }

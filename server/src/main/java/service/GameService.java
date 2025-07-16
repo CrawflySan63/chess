@@ -84,26 +84,42 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
 
-        //get game by ID
-        GameData game = dataAccess.getGame(request.gameID());
-        if (game == null) {
-            throw new DataAccessException("Error: bad request"); // Game doesn't exist
+        //validate player color
+        String colorStr = request.playerColor();
+        boolean isWhite = colorStr.equalsIgnoreCase("WHITE");
+        boolean isBlack = colorStr.equalsIgnoreCase("BLACK");
+
+        if (!isWhite && !isBlack) {
+            throw new DataAccessException("Error: bad request");
         }
 
-        //Check if requested color is already taken
-        if (request.playerColor().equalsIgnoreCase("WHITE")) {
-            if (game.whiteUsername() != null) {
+        //get game
+        GameData oldGame = dataAccess.getGame(request.gameID());
+        if (oldGame == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+
+        //check if the requested color is already taken
+        if (isWhite) {
+            if (oldGame.whiteUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            game = new GameData(game.gameID(), authData.username(), game.blackUsername(), game.gameName(), game.game());
         } else {
-            if (game.blackUsername() != null) {
+            if (oldGame.blackUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            game = new GameData(game.gameID(), game.whiteUsername(), authData.username(), game.gameName(), game.game());
         }
 
-        //Save updated game back to database
-        dataAccess.insertGame(game);
+        //create new GameData with updated player
+        GameData newGame = new GameData(
+                oldGame.gameID(),
+                isWhite ? authData.username() : oldGame.whiteUsername(),
+                isBlack ? authData.username() : oldGame.blackUsername(),
+                oldGame.gameName(),
+                oldGame.game()
+        );
+
+        //replace game in DAO
+        dataAccess.replaceGame(newGame);
     }
 }
