@@ -6,6 +6,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import result.CreateGameResult;
 import result.GameSummary;
 import result.ListGamesResult;
@@ -67,5 +68,42 @@ public class GameService {
         //return success
         return new CreateGameResult(gameID);
 
+    }
+
+    public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
+        //validate input (make sure authToken, request and playerColor aren't empty or null
+        if (authToken == null || authToken.isBlank() ||
+                request == null || request.playerColor() == null ||
+                (!request.playerColor().equalsIgnoreCase("WHITE") && !request.playerColor().equalsIgnoreCase("BLACK"))) {
+            throw new DataAccessException("Error: bad request");
+        }
+
+        //validate authToken (make sure it's in the database)
+        AuthData authData = dataAccess.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+
+        //get game by ID
+        GameData game = dataAccess.getGame(request.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request"); // Game doesn't exist
+        }
+
+        //Check if requested color is already taken
+        if (request.playerColor().equalsIgnoreCase("WHITE")) {
+            if (game.whiteUsername() != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            game = new GameData(game.gameID(), authData.username(), game.blackUsername(), game.gameName(), game.game());
+        } else {
+            if (game.blackUsername() != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            game = new GameData(game.gameID(), game.whiteUsername(), authData.username(), game.gameName(), game.game());
+        }
+
+        //Save updated game back to database
+        dataAccess.insertGame(game);
     }
 }
