@@ -74,7 +74,7 @@ public class GameService {
         //validate input (make sure authToken, request and playerColor aren't empty or null
         if (authToken == null || authToken.isBlank() ||
                 request == null || request.playerColor() == null ||
-                (!request.playerColor().equalsIgnoreCase("WHITE") && !request.playerColor().equalsIgnoreCase("BLACK"))) {
+                (!(request.playerColor() == ChessGame.TeamColor.WHITE) && !(request.playerColor() == ChessGame.TeamColor.BLACK))) {
             throw new DataAccessException("Error: bad request");
         }
 
@@ -85,13 +85,8 @@ public class GameService {
         }
 
         //validate player color
-        String colorStr = request.playerColor();
-        boolean isWhite = colorStr.equalsIgnoreCase("WHITE");
-        boolean isBlack = colorStr.equalsIgnoreCase("BLACK");
-
-        if (!isWhite && !isBlack) {
-            throw new DataAccessException("Error: bad request");
-        }
+        boolean isWhite = request.playerColor() == ChessGame.TeamColor.WHITE;
+        boolean isBlack = request.playerColor() == ChessGame.TeamColor.BLACK;
 
         //get game
         GameData oldGame = dataAccess.getGame(request.gameID());
