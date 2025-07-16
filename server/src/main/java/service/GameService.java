@@ -7,9 +7,11 @@ import model.AuthData;
 import model.GameData;
 import request.CreateGameRequest;
 import result.CreateGameResult;
+import result.GameSummary;
 import result.ListGamesResult;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class GameService {
@@ -26,11 +28,21 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
 
-        //if above passes, then get all games
-        Collection<GameData> games = dataAccess.listGames();
+        //if above passes, then get gameID, usernames, and gameName
+        //from DA method listGames
+        List<GameSummary> summaries = new ArrayList<>();
+        for (GameData game : dataAccess.listGames()) {
+            summaries.add(new GameSummary(
+                    game.gameID(),
+                    game.whiteUsername(),
+                    game.blackUsername(),
+                    game.gameName()
+            ));
+        }
 
-        //return the result by passing in collection of GameData objects made above
-        return new ListGamesResult(games);
+        //return the result by passing in a list of *GameSummary* (not GameData) objects made above
+        //using GameSummary record allows us to not include ChessGame game in the HTML response
+        return new ListGamesResult(summaries);
     }
 
     public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
