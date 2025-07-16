@@ -17,10 +17,11 @@ public class ListGamesServiceTest {
         DataAccess dataAccess = new MemoryDataAccess();
         gameService = new GameService(dataAccess);
 
-        // Add a user and auth
+        // Add a user
         UserData user = new UserData("bob", "password", "email@example.com");
         dataAccess.insertUser(user);
 
+        //add auth
         AuthData auth = new AuthData("valid-token", "bob");
         dataAccess.insertAuth(auth);
 
