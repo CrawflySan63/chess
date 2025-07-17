@@ -295,7 +295,8 @@ public class ChessGame {
 
                     int endRow = 1;
                     int endCol = 7;
-                    isSafeKingSide(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE);
+                    int[] checkCol = {5, 6, 7};
+                    isSafe(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE, checkCol);
                 }
             }
             if (!whiteQueenRookMoved) {
@@ -308,7 +309,8 @@ public class ChessGame {
 
                     int endRow = 1;
                     int endCol = 3;
-                    isSafeQueenSide(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE);
+                    int[] checkCol = {5, 4, 3};
+                    isSafe(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE, checkCol);
                 }
             }
         }
@@ -325,7 +327,8 @@ public class ChessGame {
 
                     int endRow = 8;
                     int endCol = 7;
-                    isSafeKingSide(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK);
+                    int[] checkCol = {5, 6, 7};
+                    isSafe(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK, checkCol);
                 }
             }
             if (!blackQueenRookMoved) {
@@ -338,7 +341,8 @@ public class ChessGame {
 
                     int endRow = 8;
                     int endCol = 3;
-                    isSafeQueenSide(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK);
+                    int[] checkCol = {5, 4, 3};
+                    isSafe(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK, checkCol);
                 }
             }
         }
@@ -500,25 +504,10 @@ public class ChessGame {
         }
     }
 
-    private void isSafeQueenSide(int endRow, int endCol, Collection<ChessMove> castlingMoves,
-                                 ChessPosition kingPos, TeamColor teamColor) {
+    private void isSafe(int endRow, int endCol, Collection<ChessMove> castlingMoves,
+                                 ChessPosition kingPos, TeamColor teamColor, int[] checkCol) {
         boolean safe = true;
-        for (int col : new int[]{5, 4, 3}) {
-            ChessBoard testBoard = deepCopyBoard(board);
-            // previous square
-            ChessPosition to = new ChessPosition(endRow, col);
-            applyMove(testBoard, new ChessMove(kingPos, to, null));
-            if (isInCheckOnBoard(testBoard, teamColor)) {
-                safe = false;
-                break;
-            }
-        }
-        addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
-    }
-
-    private void isSafeKingSide(int endRow, int endCol, Collection<ChessMove> castlingMoves, ChessPosition kingPos, TeamColor teamColor) {
-        boolean safe = true;
-        for (int col : new int[]{5, 6, 7}) {
+        for (int col : checkCol) {
             ChessBoard testBoard = deepCopyBoard(board);
             // previous square
             ChessPosition to = new ChessPosition(endRow, col);
