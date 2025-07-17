@@ -33,7 +33,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    public void testRegisterNegative_UsernameTaken() throws DataAccessException {
+    public void testRegisterNegativeUsernameTaken() throws DataAccessException {
         //register the user successfully
         RegisterRequest firstRequest = new RegisterRequest("user1", "pass123", "user1@example.com");
         userService.register(firstRequest);

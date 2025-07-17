@@ -28,7 +28,7 @@ public class CreateGameServiceTest {
     }
 
     @Test
-    public void createGame_Success() throws DataAccessException {
+    public void createGameSuccess() throws DataAccessException {
         CreateGameRequest request = new CreateGameRequest("Cool Chess Game");
         CreateGameResult result = gameService.createGame(request, "valid-token");
 
@@ -37,7 +37,7 @@ public class CreateGameServiceTest {
     }
 
     @Test
-    public void createGame_InvalidToken() {
+    public void createGameInvalidToken() {
         CreateGameRequest request = new CreateGameRequest("Another Game");
 
         DataAccessException exception = assertThrows(DataAccessException.class,
@@ -46,7 +46,7 @@ public class CreateGameServiceTest {
     }
 
     @Test
-    public void createGame_BadRequest() {
+    public void createGameBadRequest() {
         CreateGameRequest request = new CreateGameRequest(null); // Invalid name
 
         DataAccessException exception = assertThrows(DataAccessException.class,

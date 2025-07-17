@@ -25,7 +25,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void login_success() throws DataAccessException {
+    void loginSuccess() throws DataAccessException {
         LoginRequest request = new LoginRequest("testuser", "password123");
         LoginResult result = userService.login(request);
 
@@ -34,7 +34,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void login_wrongPassword_fails() {
+    void loginWrongPasswordFails() {
         LoginRequest badRequest = new LoginRequest("testuser", "wrongpass");
 
         DataAccessException exception = assertThrows(DataAccessException.class,

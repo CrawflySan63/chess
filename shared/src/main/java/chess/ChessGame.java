@@ -79,7 +79,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null) return null;
+        if (piece == null) {
+            return null;
+        }
 
         Collection<ChessMove> baseMoves = piece.pieceMoves(board, startPosition);
 
@@ -153,7 +155,9 @@ public class ChessGame {
                 if (row == 1 && col == 1) {
                     whiteQueenRookMoved = true;
                 }
-                if (row == 1 && col == 8) whiteKingRookMoved = true;
+                if (row == 1 && col == 8) {
+                    whiteKingRookMoved = true;
+                }
             } else {
                 if (row == 8 && col == 1) {
                     blackQueenRookMoved = true;
@@ -187,7 +191,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
 
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -213,7 +219,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) return false;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
 
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -265,9 +273,9 @@ public class ChessGame {
     }
 
     private boolean moveAdjacentTo(ChessPosition a, ChessPosition b) {
-        int row_diff = Math.abs(a.getRow() - b.getRow());
-        int col_diff = Math.abs(a.getColumn() - b.getColumn());
-        return row_diff <= 1 && col_diff <= 1;
+        int rowDiff = Math.abs(a.getRow() - b.getRow());
+        int colDiff = Math.abs(a.getColumn() - b.getColumn());
+        return rowDiff <= 1 && colDiff <= 1;
     }
 
     private Collection<ChessMove> getCastlingMoves(ChessPiece kingPiece, ChessPosition kingPos) {
@@ -284,7 +292,9 @@ public class ChessGame {
         if (kingPiece.getTeamColor() == TeamColor.WHITE) {
             //make sure king hasn't moved
             //make sure rooks haven't moved
-            if (whiteKingMoved) return castlingMoves;
+            if (whiteKingMoved) {
+                return castlingMoves;
+            }
             if (!whiteKingRookMoved) {
                 //make sure spaces between king and rook are empty
                 //make sure no spots are under attack
@@ -295,9 +305,9 @@ public class ChessGame {
                     boolean safe = true;
                     for (int col : new int[]{5, 6, 7}) {
                         ChessBoard testBoard = deepCopyBoard(board);
-                        ChessPosition from = kingPos; // previous square
+                        // previous square
                         ChessPosition to = new ChessPosition(1, col);
-                        applyMove(testBoard, new ChessMove(from, to, null));
+                        applyMove(testBoard, new ChessMove(kingPos, to, null));
                         if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
                             safe = false;
                             break;
@@ -320,9 +330,9 @@ public class ChessGame {
                     boolean safe = true;
                     for (int col : new int[]{5, 4, 3}) {
                         ChessBoard testBoard = deepCopyBoard(board);
-                        ChessPosition from = kingPos; // previous square
+                        // previous square
                         ChessPosition to = new ChessPosition(1, col);
-                        applyMove(testBoard, new ChessMove(from, to, null));
+                        applyMove(testBoard, new ChessMove(kingPos, to, null));
                         if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
                             safe = false;
                             break;
@@ -336,7 +346,9 @@ public class ChessGame {
             }
         }
         if (kingPiece.getTeamColor() == TeamColor.BLACK) {
-            if (blackKingMoved) return castlingMoves;
+            if (blackKingMoved) {
+                return castlingMoves;
+            }
             if (!blackKingRookMoved) {
                 //make sure spaces between king and rook are empty
                 //make sure no spots are under attack
@@ -347,9 +359,9 @@ public class ChessGame {
                     boolean safe = true;
                     for (int col : new int[]{5, 6, 7}) {
                         ChessBoard testBoard = deepCopyBoard(board);
-                        ChessPosition from = kingPos; // previous square
+                        // previous square
                         ChessPosition to = new ChessPosition(8, col);
-                        applyMove(testBoard, new ChessMove(from, to, null));
+                        applyMove(testBoard, new ChessMove(kingPos, to, null));
                         if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
                             safe = false;
                             break;
@@ -372,9 +384,9 @@ public class ChessGame {
                     boolean safe = true;
                     for (int col : new int[]{5, 4, 3}) {
                         ChessBoard testBoard = deepCopyBoard(board);
-                        ChessPosition from = kingPos; // previous square
+                        // previous square
                         ChessPosition to = new ChessPosition(8, col);
-                        applyMove(testBoard, new ChessMove(from, to, null));
+                        applyMove(testBoard, new ChessMove(kingPos, to, null));
                         if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
                             safe = false;
                             break;
@@ -439,7 +451,9 @@ public class ChessGame {
             }
         }
 
-        if (kingPos == null) return false;
+        if (kingPos == null) {
+            return false;
+        }
 
         // Check if any opposing piece can move to the king's position
         for (int row = 1; row <= 8; row++) {
