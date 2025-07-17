@@ -24,7 +24,7 @@ public class ClearServiceTest {
     }
 
     @Test
-    public void testClear_Positive() throws Exception {
+    public void testClearPositive() throws Exception {
         // Arrange – insert fake data
         dataAccess.insertUser(new UserData("testUser", "password", "email@test.com"));
         dataAccess.insertAuth(new AuthData("token123", "testUser"));
