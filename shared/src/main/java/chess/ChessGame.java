@@ -164,7 +164,6 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in checkmate
-     *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
@@ -196,7 +195,6 @@ public class ChessGame {
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
-     *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
      */
@@ -210,7 +208,6 @@ public class ChessGame {
 
     /**
      * Sets this game's chessboard with a given board
-     *
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
@@ -376,24 +373,7 @@ public class ChessGame {
         }
 
         // Check if any opposing piece can move to the king's position
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = boardToTest.getPiece(pos);
-                // Skip null or same team pieces early
-                if (piece == null || piece.getTeamColor() == teamColor) {
-                    continue;
-                }
-                // Only enemy pieces left, check their moves
-                Collection<ChessMove> theirMoves = piece.pieceMoves(board, pos);
-                for (ChessMove move : theirMoves) {
-                    if (move.getEndPosition().equals(kingPos)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return isKingInCheck(boardToTest, teamColor, kingPos);
     }
 
     private ChessBoard deepCopyBoard(ChessBoard original) {
@@ -493,5 +473,28 @@ public class ChessGame {
             }
         }
         addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+    }
+
+    private boolean isKingInCheck(ChessBoard board, TeamColor teamColor, ChessPosition kingPos) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+
+                // Skip null or same team pieces early
+                if (piece == null || piece.getTeamColor() == teamColor) {
+                    continue;
+                }
+
+                // Only enemy pieces left, check their moves
+                Collection<ChessMove> theirMoves = piece.pieceMoves(board, pos);
+                for (ChessMove move : theirMoves) {
+                    if (move.getEndPosition().equals(kingPos)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
