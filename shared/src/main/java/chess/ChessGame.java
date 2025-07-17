@@ -15,10 +15,8 @@ public class ChessGame {
 
     private boolean whiteKingMoved = false;
     private boolean blackKingMoved = false;
-
     private boolean whiteQueenRookMoved = false;  // a1 rook
     private boolean whiteKingRookMoved = false;   // h1 rook
-
     private boolean blackQueenRookMoved = false;  // a8 rook
     private boolean blackKingRookMoved = false;   // h8 rook
 
@@ -26,7 +24,6 @@ public class ChessGame {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
-
     }
 
     @Override
@@ -46,37 +43,19 @@ public class ChessGame {
         return Objects.hash(board, currentTurn);
     }
 
-    /**
-     * @return Which team's turn it is
-     */
     public TeamColor getTeamTurn() {
         return currentTurn;
     }
 
-    /**
-     * Set's which teams turn it is
-     *
-     * @param team the team whose turn it is
-     */
     public void setTeamTurn(TeamColor team) {
         this.currentTurn = team;
     }
 
-    /**
-     * Enum identifying the 2 possible teams in a chess game
-     */
     public enum TeamColor {
         WHITE,
         BLACK
     }
 
-    /**
-     * Gets a valid moves for a piece at the given location
-     *
-     * @param startPosition the piece to get valid moves for
-     * @return Set of valid moves for requested piece, or null if no piece at
-     * startPosition
-     */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
@@ -114,7 +93,6 @@ public class ChessGame {
                 valid.add(move);
             }
         }
-
         return valid;
     }
 
@@ -441,7 +419,6 @@ public class ChessGame {
     private void applyMove(ChessBoard board, ChessMove move) {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-
         ChessPiece pieceToMove = board.getPiece(start);
 
         if (pieceToMove.getPieceType() == ChessPiece.PieceType.PAWN &&
