@@ -6,7 +6,7 @@ import dataaccess.DataAccessException;
 
 public class HandlerUtils {
 
-    private static final Gson gson = new Gson();
+    private static final Gson gSon = new Gson();
 
     public static String handleException(Exception e, Response res) {
         if (e instanceof DataAccessException dae) {
@@ -18,10 +18,10 @@ public class HandlerUtils {
             } else {
                 res.status(500);
             }
-            return gson.toJson(new ErrorMessage(msg));
+            return gSon.toJson(new ErrorMessage(msg));
         } else {
             res.status(500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return gSon.toJson(new ErrorMessage("Error: " + e.getMessage()));
         }
     }
 
