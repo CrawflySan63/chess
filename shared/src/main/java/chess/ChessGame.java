@@ -293,6 +293,8 @@ public class ChessGame {
                 if (board.getPiece(new ChessPosition(1, 6)) == null &&
                         board.getPiece(new ChessPosition(1, 7)) == null) {
 
+                    int endRow = 1;
+                    int endCol = 7;
                     boolean safe = true;
                     for (int col : new int[]{5, 6, 7}) {
                         ChessBoard testBoard = deepCopyBoard(board);
@@ -304,9 +306,6 @@ public class ChessGame {
                             break;
                         }
                     }
-
-                    int endRow = 1;
-                    int endCol = 7;
                     addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
@@ -317,6 +316,10 @@ public class ChessGame {
                 if (board.getPiece(new ChessPosition(1, 4)) == null &&
                         board.getPiece(new ChessPosition(1, 3)) == null &&
                         board.getPiece(new ChessPosition(1, 2)) == null) {
+
+                    int endRow = 1;
+                    int endCol = 3;
+
 
                     boolean safe = true;
                     for (int col : new int[]{5, 4, 3}) {
@@ -329,9 +332,6 @@ public class ChessGame {
                             break;
                         }
                     }
-
-                    int endRow = 1;
-                    int endCol = 3;
                     addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
@@ -347,6 +347,8 @@ public class ChessGame {
                 if (board.getPiece(new ChessPosition(8, 6)) == null &&
                         board.getPiece(new ChessPosition(8, 7)) == null) {
 
+                    int endRow = 8;
+                    int endCol = 7;
                     boolean safe = true;
                     for (int col : new int[]{5, 6, 7}) {
                         ChessBoard testBoard = deepCopyBoard(board);
@@ -358,9 +360,6 @@ public class ChessGame {
                             break;
                         }
                     }
-
-                    int endRow = 8;
-                    int endCol = 7;
                     addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
@@ -372,6 +371,8 @@ public class ChessGame {
                         board.getPiece(new ChessPosition(8, 4)) == null &&
                         board.getPiece(new ChessPosition(8, 2)) == null) {
 
+                    int endRow = 8;
+                    int endCol = 3;
                     boolean safe = true;
                     for (int col : new int[]{5, 4, 3}) {
                         ChessBoard testBoard = deepCopyBoard(board);
@@ -383,9 +384,6 @@ public class ChessGame {
                             break;
                         }
                     }
-
-                    int endRow = 8;
-                    int endCol = 3;
                     addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
