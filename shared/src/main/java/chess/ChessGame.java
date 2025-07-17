@@ -295,18 +295,7 @@ public class ChessGame {
 
                     int endRow = 1;
                     int endCol = 7;
-                    boolean safe = true;
-                    for (int col : new int[]{5, 6, 7}) {
-                        ChessBoard testBoard = deepCopyBoard(board);
-                        // previous square
-                        ChessPosition to = new ChessPosition(1, col);
-                        applyMove(testBoard, new ChessMove(kingPos, to, null));
-                        if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+                    isSafeKingSide(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE);
                 }
             }
             if (!whiteQueenRookMoved) {
@@ -319,20 +308,7 @@ public class ChessGame {
 
                     int endRow = 1;
                     int endCol = 3;
-
-
-                    boolean safe = true;
-                    for (int col : new int[]{5, 4, 3}) {
-                        ChessBoard testBoard = deepCopyBoard(board);
-                        // previous square
-                        ChessPosition to = new ChessPosition(1, col);
-                        applyMove(testBoard, new ChessMove(kingPos, to, null));
-                        if (isInCheckOnBoard(testBoard, TeamColor.WHITE)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+                    isSafeQueenSide(endRow, endCol, castlingMoves, kingPos, TeamColor.WHITE);
                 }
             }
         }
@@ -349,18 +325,7 @@ public class ChessGame {
 
                     int endRow = 8;
                     int endCol = 7;
-                    boolean safe = true;
-                    for (int col : new int[]{5, 6, 7}) {
-                        ChessBoard testBoard = deepCopyBoard(board);
-                        // previous square
-                        ChessPosition to = new ChessPosition(8, col);
-                        applyMove(testBoard, new ChessMove(kingPos, to, null));
-                        if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+                    isSafeKingSide(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK);
                 }
             }
             if (!blackQueenRookMoved) {
@@ -373,18 +338,7 @@ public class ChessGame {
 
                     int endRow = 8;
                     int endCol = 3;
-                    boolean safe = true;
-                    for (int col : new int[]{5, 4, 3}) {
-                        ChessBoard testBoard = deepCopyBoard(board);
-                        // previous square
-                        ChessPosition to = new ChessPosition(8, col);
-                        applyMove(testBoard, new ChessMove(kingPos, to, null));
-                        if (isInCheckOnBoard(testBoard, TeamColor.BLACK)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+                    isSafeQueenSide(endRow, endCol, castlingMoves, kingPos, TeamColor.BLACK);
                 }
             }
         }
@@ -477,7 +431,6 @@ public class ChessGame {
                 }
             }
         }
-
         return copy;
     }
 
@@ -537,7 +490,6 @@ public class ChessGame {
         if (move.getPromotionPiece() != null) {
             pieceToMove = new ChessPiece (pieceToMove.getTeamColor(), move.getPromotionPiece());
         }
-
         board.addPiece(end, pieceToMove);
     }
 
@@ -546,5 +498,36 @@ public class ChessGame {
         if (safe) {
             castlingMoves.add(new ChessMove(kingPos, new ChessPosition(endRow, endCol), null));
         }
+    }
+
+    private void isSafeQueenSide(int endRow, int endCol, Collection<ChessMove> castlingMoves,
+                                 ChessPosition kingPos, TeamColor teamColor) {
+        boolean safe = true;
+        for (int col : new int[]{5, 4, 3}) {
+            ChessBoard testBoard = deepCopyBoard(board);
+            // previous square
+            ChessPosition to = new ChessPosition(endRow, col);
+            applyMove(testBoard, new ChessMove(kingPos, to, null));
+            if (isInCheckOnBoard(testBoard, teamColor)) {
+                safe = false;
+                break;
+            }
+        }
+        addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
+    }
+
+    private void isSafeKingSide(int endRow, int endCol, Collection<ChessMove> castlingMoves, ChessPosition kingPos, TeamColor teamColor) {
+        boolean safe = true;
+        for (int col : new int[]{5, 6, 7}) {
+            ChessBoard testBoard = deepCopyBoard(board);
+            // previous square
+            ChessPosition to = new ChessPosition(endRow, col);
+            applyMove(testBoard, new ChessMove(kingPos, to, null));
+            if (isInCheckOnBoard(testBoard, teamColor)) {
+                safe = false;
+                break;
+            }
+        }
+        addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
     }
 }
