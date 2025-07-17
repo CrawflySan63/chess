@@ -305,9 +305,9 @@ public class ChessGame {
                         }
                     }
 
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(1, 7), null));
-                    }
+                    int endRow = 1;
+                    int endCol = 7;
+                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
             if (!whiteQueenRookMoved) {
@@ -330,9 +330,9 @@ public class ChessGame {
                         }
                     }
 
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(1, 3), null));
-                    }
+                    int endRow = 1;
+                    int endCol = 3;
+                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
         }
@@ -359,9 +359,9 @@ public class ChessGame {
                         }
                     }
 
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(8, 7), null));
-                    }
+                    int endRow = 8;
+                    int endCol = 7;
+                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
             if (!blackQueenRookMoved) {
@@ -384,9 +384,9 @@ public class ChessGame {
                         }
                     }
 
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(8, 3), null));
-                    }
+                    int endRow = 8;
+                    int endCol = 3;
+                    addCastlingMove(safe, endRow, endCol, castlingMoves, kingPos);
                 }
             }
         }
@@ -541,5 +541,12 @@ public class ChessGame {
         }
 
         board.addPiece(end, pieceToMove);
+    }
+
+    private void addCastlingMove(boolean safe, int endRow, int endCol,
+                                 Collection<ChessMove> castlingMoves, ChessPosition kingPos) {
+        if (safe) {
+            castlingMoves.add(new ChessMove(kingPos, new ChessPosition(endRow, endCol), null));
+        }
     }
 }
