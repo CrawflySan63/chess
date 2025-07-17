@@ -217,11 +217,6 @@ public class ChessGame {
         this.board = board;
     }
 
-    /**
-     * Gets the current chessboard
-     *
-     * @return the chessboard
-     */
     public ChessBoard getBoard() {
         return board;
     }
@@ -383,18 +378,21 @@ public class ChessGame {
         // Check if any opposing piece can move to the king's position
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPiece piece = boardToTest.getPiece(new ChessPosition(row, col));
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> theirMoves = piece.pieceMoves(boardToTest, new ChessPosition(row, col));
-                    for (ChessMove move : theirMoves) {
-                        if (move.getEndPosition().equals(kingPos)) {
-                            return true;
-                        }
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = boardToTest.getPiece(pos);
+                // Skip null or same team pieces early
+                if (piece == null || piece.getTeamColor() == teamColor) {
+                    continue;
+                }
+                // Only enemy pieces left, check their moves
+                Collection<ChessMove> theirMoves = piece.pieceMoves(board, pos);
+                for (ChessMove move : theirMoves) {
+                    if (move.getEndPosition().equals(kingPos)) {
+                        return true;
                     }
                 }
             }
         }
-
         return false;
     }
 
