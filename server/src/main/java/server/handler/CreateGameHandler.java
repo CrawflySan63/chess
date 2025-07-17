@@ -8,6 +8,7 @@ import dataaccess.DataAccessException;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import server.util.HandlerUtils;
 
 public class CreateGameHandler implements Route {
     private final GameService gameService;
@@ -33,19 +34,7 @@ public class CreateGameHandler implements Route {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (e.getMessage().contains("bad request")) {
-                res.status(400);
-            } else if (e.getMessage().contains("unauthorized")) {
-                res.status(401);
-            } else {
-                res.status(500);
-            }
-            return gson.toJson(new ErrorMessage(e.getMessage()));
-        } catch (Exception e) {
-            res.status(500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return HandlerUtils.handleException(e, res);
         }
     }
-
-    private record ErrorMessage(String message) {}
 }
