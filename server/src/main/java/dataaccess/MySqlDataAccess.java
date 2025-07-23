@@ -9,11 +9,6 @@ import com.google.gson.Gson;
 public class MySqlDataAccess implements DataAccess {
     private final Gson gson = new Gson();
 
-    public MySqlDataAccess() throws DataAccessException {
-        DatabaseManager.createDatabase();      // Optional if your DB is pre-created
-        DatabaseManager.configureTables();     // Ensures tables are created in correct DB
-    }
-
     @Override
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();

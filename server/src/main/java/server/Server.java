@@ -12,7 +12,7 @@ import service.UserService;
 
 public class Server {
 
-    public int run(int desiredPort) throws DataAccessException {
+    public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
