@@ -23,29 +23,13 @@ public class GameService {
     }
 
     public ListGamesResult listGames(String authToken) throws DataAccessException {
-        //validate token (like in LogoutService.logout())
-        AuthData auth;
-        try {
-            auth = dataAccess.getAuth(authToken);
-        } catch (Exception e) {
-            //database failure
-            throw new DataAccessException("Error: internal server error", e);
-        }
-
+        AuthData auth = dataAccess.getAuth(authToken);
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
 
-        //if above passes, then get gameID, usernames, and gameName
-        //from DA method listGames
         List<GameSummary> summaries = new ArrayList<>();
-        List<GameData> gameList;
-
-        try {
-            gameList = new ArrayList<>(dataAccess.listGames());
-        } catch (Exception e) {
-            throw new DataAccessException("Error: internal server error", e);
-        }
+        List<GameData> gameList = new ArrayList<>(dataAccess.listGames());
 
         for (GameData game : gameList) {
             summaries.add(new GameSummary(
@@ -56,102 +40,57 @@ public class GameService {
             ));
         }
 
-        //return the result by passing in a list of *GameSummary* (not GameData) objects made above
-        //using GameSummary record allows us to not include ChessGame game in the HTML response
         return new ListGamesResult(summaries);
     }
 
     public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
-        //validate token
-        AuthData auth;
-        try {
-            auth = dataAccess.getAuth(authToken);
-        } catch (Exception e) {
-            //database failure
-            throw new DataAccessException("Error: internal server error", e);
-        }
-
+        AuthData auth = dataAccess.getAuth(authToken);
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
 
-        //validate gameName from the request
         if (request.gameName() == null || request.gameName().isBlank()) {
             throw new DataAccessException("Error: bad request");
         }
 
-        //if both authToken and gameName  are valid, then generate gameID
         int gameID = Math.abs(UUID.randomUUID().hashCode());
+        GameData gameData = new GameData(gameID, null, null, request.gameName(), new ChessGame());
+        dataAccess.insertGame(gameData);
 
-        //create and insert GameData
-        GameData gameData = new GameData(gameID, null,  null, request.gameName(), new ChessGame());
-        try {
-            dataAccess.insertGame(gameData);
-        } catch (Exception e) {
-            throw new DataAccessException("Error: internal server error", e);
-        }
-
-        //return success
         return new CreateGameResult(gameID);
-
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
-        // Validate input
         if (authToken == null || authToken.isBlank() || request == null) {
             throw new DataAccessException("Error: bad request");
         }
 
-        // Validate playerColor
         ChessGame.TeamColor playerColor = request.playerColor();
-        if ((playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK)) {
+        if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK) {
             throw new DataAccessException("Error: bad request");
         }
 
-        // Validate authToken
-        AuthData authData;
-        try {
-            authData = dataAccess.getAuth(authToken);
-        } catch (Exception e) {
-            //database failure
-            throw new DataAccessException("Error: internal server error", e);
-        }
+        AuthData authData = dataAccess.getAuth(authToken);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        String username = authData.username();
-        //System.out.println("Saving username as: " + username);
 
-        // Get the game from database
-        GameData game;
-        try {
-            game = dataAccess.getGame(request.gameID());
-        } catch (Exception e) {
-            throw new DataAccessException("Error: internal server error", e);
-        }
+        String username = authData.username();
+        GameData game = dataAccess.getGame(request.gameID());
         if (game == null) {
             throw new DataAccessException("Error: bad request");
         }
 
         // Check if color is already taken
-        if (playerColor == ChessGame.TeamColor.WHITE) {
-            if (game.whiteUsername() != null) {
-                throw new DataAccessException("Error: already taken");
-            }
-        } else {
-            if (game.blackUsername() != null) {
-                throw new DataAccessException("Error: already taken");
-            }
+        if ((playerColor == ChessGame.TeamColor.WHITE && game.whiteUsername() != null)
+                || (playerColor == ChessGame.TeamColor.BLACK && game.blackUsername() != null)) {
+            throw new DataAccessException("Error: already taken");
         }
 
-        try {
-            if (playerColor == ChessGame.TeamColor.WHITE) {
-                dataAccess.setWhiteUsername(game.gameID(), username);
-            } else {
-                dataAccess.setBlackUsername(game.gameID(), username);
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: internal server error", e);
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            dataAccess.setWhiteUsername(game.gameID(), username);
+        } else {
+            dataAccess.setBlackUsername(game.gameID(), username);
         }
     }
 }

@@ -11,17 +11,20 @@ public class HandlerUtils {
     public static String handleException(Exception e, Response res) {
         if (e instanceof DataAccessException dae) {
             String msg = dae.getMessage();
-            if (msg.contains("internal server error")) {
-                res.status(500);
-            } else if (msg.contains("bad request")) {
+            String lowerMsg = msg.toLowerCase(); // normalize for matching
+
+            if (lowerMsg.contains("bad request")) {
                 res.status(400);
-            } else if (msg.contains("unauthorized")) {
+            } else if (lowerMsg.contains("unauthorized")) {
                 res.status(401);
-            } else if (msg.contains("already taken")) {
+            } else if (lowerMsg.contains("already taken")) {
                 res.status(403);
+            } else if (lowerMsg.contains("internal server error")) {
+                res.status(500);
             } else {
                 res.status(500);
             }
+
             return GSON.toJson(new ErrorMessage(msg));
         } else {
             res.status(500);

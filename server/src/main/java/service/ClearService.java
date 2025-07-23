@@ -13,6 +13,8 @@ public class ClearService {
         try {
             dataAccess.clear();
         } catch (Exception e) {
+            System.err.println("ClearService failed: " + e.getMessage());
+            e.printStackTrace();
             throw new DataAccessException("Error: internal server error", e);
         }
     }

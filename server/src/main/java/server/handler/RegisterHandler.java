@@ -21,7 +21,7 @@ public class RegisterHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws Exception {
         try {
-            //step 1 parse rquest JSON into RegisterRequest object
+            //step 1 parse request JSON into RegisterRequest object
             RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
 
             //step 2 call the service

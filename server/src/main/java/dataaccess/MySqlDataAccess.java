@@ -13,9 +13,15 @@ public class MySqlDataAccess implements DataAccess {
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
+
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
+
             stmt.executeUpdate("DELETE FROM AuthTokens");
             stmt.executeUpdate("DELETE FROM Games");
             stmt.executeUpdate("DELETE FROM Users");
+
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
+
         } catch (SQLException e) {
             throw new DataAccessException("Failed to clear database", e);
         }
