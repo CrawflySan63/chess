@@ -120,7 +120,7 @@ public class MySqlDataAccess implements DataAccess {
             stmt.setInt(2, gameID);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new DataAccessException("Eerror: GameID not found for white username");
+                throw new DataAccessException("Error: GameID not found for white username");
             }
         } catch (SQLException ex) {
             throw new DataAccessException("Error updating whiteUsername", ex);
