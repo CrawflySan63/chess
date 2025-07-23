@@ -78,8 +78,7 @@ public class GameService {
 
         // Validate playerColor
         ChessGame.TeamColor playerColor = request.playerColor();
-        if (playerColor == null ||
-                (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK)) {
+        if ((playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK)) {
             throw new DataAccessException("Error: bad request");
         }
 
@@ -89,6 +88,7 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
         String username = authData.username();
+        System.out.println("Saving username as: " + username);
 
         // Get the game from database
         GameData game = dataAccess.getGame(request.gameID());
@@ -101,12 +101,12 @@ public class GameService {
             if (game.whiteUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            dataAccess.setWhiteUsername(game.gameID(), username);  // ✅ Only update white player
+            dataAccess.setWhiteUsername(game.gameID(), username);  // update white player
         } else {
             if (game.blackUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            dataAccess.setBlackUsername(game.gameID(), username);  // ✅ Only update black player
+            dataAccess.setBlackUsername(game.gameID(), username);  // update black player
         }
     }
 }

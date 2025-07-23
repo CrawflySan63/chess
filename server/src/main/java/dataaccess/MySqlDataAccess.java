@@ -85,7 +85,7 @@ public class MySqlDataAccess implements DataAccess {
             stmt.setString(1, token);
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new AuthData(rs.getString("username"), rs.getString("token"));
+                    return new AuthData(rs.getString("token"), rs.getString("username"));
                 }
             }
             return null;
