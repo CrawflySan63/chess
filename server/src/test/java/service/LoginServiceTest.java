@@ -11,6 +11,8 @@ import result.LoginResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class LoginServiceTest {
     private UserService userService;
 
@@ -20,7 +22,7 @@ public class LoginServiceTest {
         userService = new UserService(dataAccess);
 
         //register a user for login testing
-        UserData user = new UserData("testuser", "password123", "email@example.com");
+        UserData user = new UserData("testuser", BCrypt.hashpw("password123", BCrypt.gensalt()), "email@example.com");
         dataAccess.insertUser(user);
     }
 
