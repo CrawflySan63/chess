@@ -12,6 +12,7 @@ public class Main {
             int port = server.run(8080);
         } catch (DataAccessException e) {
             System.err.println("Database setup failed: " + e.getMessage());
+            e.printStackTrace();
         }
 
     }

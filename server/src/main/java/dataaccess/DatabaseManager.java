@@ -9,6 +9,8 @@ public class DatabaseManager {
     private static String dbPassword;
     private static String connectionUrl;
 
+    private static String baseConnectionUrl;
+
     /*
      * Load the database information for the db.properties file.
      */
@@ -21,7 +23,7 @@ public class DatabaseManager {
      */
     static public void createDatabase() throws DataAccessException {
         var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+        try (var conn = DriverManager.getConnection(baseConnectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
@@ -109,6 +111,8 @@ public class DatabaseManager {
 
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
-        connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+        baseConnectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+
+        connectionUrl = String.format("jdbc:mysql://%s:%d/%s", host, port, databaseName);
     }
 }
