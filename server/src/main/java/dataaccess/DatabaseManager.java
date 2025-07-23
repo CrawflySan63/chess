@@ -47,7 +47,7 @@ public class DatabaseManager {
             //AuthTokens table
             stmt.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS AuthTokens (
-                    token VARCHAR(255) PRIMARY KEY,
+                    authToken VARCHAR(255) PRIMARY KEY,
                     username VARCHAR(255),
                     FOREIGN KEY (username) REFERENCES Users(username)
                 )

@@ -54,7 +54,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void deleteAuth(String token) throws DataAccessException {
-        var sql = "DELETE FROM AuthTokens WHERE token = ?";
+        var sql = "DELETE FROM AuthTokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, token);
@@ -66,7 +66,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void insertAuth(AuthData auth) throws DataAccessException {
-        var sql = "INSERT INTO AuthTokens (token, username) VALUES (?, ?)";
+        var sql = "INSERT INTO AuthTokens (authToken, username) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auth.authToken());
@@ -79,13 +79,13 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuth(String token) throws DataAccessException {
-        var sql = "SELECT token, username FROM AuthTokens WHERE token = ?";
+        var sql = "SELECT authToken, username FROM AuthTokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, token);
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new AuthData(rs.getString("token"), rs.getString("username"));
+                    return new AuthData(rs.getString("authToken"), rs.getString("username"));
                 }
             }
             return null;
