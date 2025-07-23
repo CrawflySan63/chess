@@ -18,13 +18,13 @@ public class MySqlDataAccessTests {
 
     //insertUser() Positive and Negative Test
     @Test
-    public void  testInsertUser_success() throws DataAccessException {
+    public void  testInsertUserSuccess() throws DataAccessException {
         var user = new UserData("billy", "pw", "billy@example.com");
         assertDoesNotThrow(() -> db.insertUser(user));
     }
 
     @Test
-    public void testInsertUser_duplicate_failure() throws DataAccessException {
+    public void testInsertUserDuplicateFailure() throws DataAccessException {
         var user = new UserData("bob", "pw", "bob@example.com");
         db.insertUser(user);
         assertThrows(DataAccessException.class, () -> db.insertUser(user));
