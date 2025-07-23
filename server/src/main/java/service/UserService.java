@@ -11,6 +11,8 @@ import result.LoginResult;
 
 import java.util.UUID;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class UserService {
     private final DataAccess dataAccess;
 
@@ -31,8 +33,9 @@ public class UserService {
             throw new DataAccessException("Error: already taken");
         }
 
-        // Step 3 create and store new user
-        UserData newUser = new UserData(request.username(), request.password(), request.email());
+        // Step 3 create and store new user (with hashed password)
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+        UserData newUser = new UserData(request.username(), hashedPassword, request.email());
         dataAccess.insertUser(newUser);
 
         // Step 4 generate and store auth token
@@ -53,7 +56,7 @@ public class UserService {
 
         //step 2 check if password is correct or user not found
         UserData user = dataAccess.getUser(request.username());
-        if (user == null || !user.password().equals(request.password())) {
+        if (user == null || !BCrypt.checkpw(request.password(), user.password())) {
             throw new DataAccessException("Error: unauthorized");
         }
 
