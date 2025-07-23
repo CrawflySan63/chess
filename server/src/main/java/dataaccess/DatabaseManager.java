@@ -38,7 +38,7 @@ public class DatabaseManager {
 
                 //users table
                 stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS Users (
+                    CREATE TABLE IF NOT EXISTS users (
                         username VARCHAR(255) PRIMARY KEY,
                         password VARCHAR(255) NOT NULL,
                         email VARCHAR(255)
@@ -47,7 +47,7 @@ public class DatabaseManager {
 
                 //AuthTokens table
                 stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS AuthTokens (
+                    CREATE TABLE IF NOT EXISTS authtokens (
                         authToken VARCHAR(255) PRIMARY KEY,
                         username VARCHAR(255),
                         FOREIGN KEY (username) REFERENCES Users(username)
@@ -56,7 +56,7 @@ public class DatabaseManager {
 
                 //Games table
                 stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS Games (
+                    CREATE TABLE IF NOT EXISTS games (
                         id INT PRIMARY KEY AUTO_INCREMENT,
                         gameName VARCHAR(255),
                         whiteUsername VARCHAR(255),

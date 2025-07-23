@@ -16,9 +16,9 @@ public class MySqlDataAccess implements DataAccess {
 
             stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
 
-            stmt.executeUpdate("DELETE FROM AuthTokens");
-            stmt.executeUpdate("DELETE FROM Games");
-            stmt.executeUpdate("DELETE FROM Users");
+            stmt.executeUpdate("DELETE FROM authtokens");
+            stmt.executeUpdate("DELETE FROM games");
+            stmt.executeUpdate("DELETE FROM users");
 
             stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
 
@@ -29,7 +29,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void insertUser(UserData user) throws DataAccessException {
-        var sql = "INSERT INTO Users (username, password, email) VALUES (?, ?, ?)";
+        var sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.username());
@@ -43,7 +43,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        var sql = "SELECT username, password, email FROM Users WHERE username = ?";
+        var sql = "SELECT username, password, email FROM users WHERE username = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -60,7 +60,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void deleteAuth(String token) throws DataAccessException {
-        var sql = "DELETE FROM AuthTokens WHERE authToken = ?";
+        var sql = "DELETE FROM authtokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, token);
@@ -72,7 +72,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void insertAuth(AuthData auth) throws DataAccessException {
-        var sql = "INSERT INTO AuthTokens (authToken, username) VALUES (?, ?)";
+        var sql = "INSERT INTO authtokens (authToken, username) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auth.authToken());
@@ -85,7 +85,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuth(String token) throws DataAccessException {
-        var sql = "SELECT authToken, username FROM AuthTokens WHERE authToken = ?";
+        var sql = "SELECT authToken, username FROM authtokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, token);
@@ -102,7 +102,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void insertGame(GameData game) throws DataAccessException {
-        var sql = "INSERT INTO Games (id, gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?, ?)";
+        var sql = "INSERT INTO games (id, gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, game.gameID());
@@ -119,7 +119,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void setWhiteUsername(int gameID, String username) throws DataAccessException {
-        var sql = "UPDATE Games SET whiteUsername = ? WHERE id = ?";
+        var sql = "UPDATE games SET whiteUsername = ? WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -135,7 +135,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void setBlackUsername(int gameID, String username) throws DataAccessException {
-        var sql = "UPDATE Games SET blackUsername = ? WHERE id = ?";
+        var sql = "UPDATE games SET blackUsername = ? WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -151,7 +151,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        var sql = "SELECT * FROM Games WHERE id = ?";
+        var sql = "SELECT * FROM games WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, gameID);
@@ -177,7 +177,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         var games = new ArrayList<GameData>();
-        var sql = "SELECT * FROM Games";
+        var sql = "SELECT * FROM games";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql);
              var rs = stmt.executeQuery()) {
