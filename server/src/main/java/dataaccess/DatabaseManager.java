@@ -32,37 +32,39 @@ public class DatabaseManager {
     }
 
     static public void configureTables() throws DataAccessException {
-        try (var conn = getConnection();
-             var stmt = conn.createStatement()) {
+        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword)) {
+            conn.setCatalog(databaseName);  // Ensure correct DB is targeted
+            try (var stmt = conn.createStatement()) {
 
-            //users table
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Users (
-                    username VARCHAR(255) PRIMARY KEY,
-                    password VARCHAR(255) NOT NULL,
-                    email VARCHAR(255)
-                )
-            """);
+                //users table
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS Users (
+                        username VARCHAR(255) PRIMARY KEY,
+                        password VARCHAR(255) NOT NULL,
+                        email VARCHAR(255)
+                    )
+                """);
 
-            //AuthTokens table
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS AuthTokens (
-                    authToken VARCHAR(255) PRIMARY KEY,
-                    username VARCHAR(255),
-                    FOREIGN KEY (username) REFERENCES Users(username)
-                )
-            """);
+                //AuthTokens table
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS AuthTokens (
+                        authToken VARCHAR(255) PRIMARY KEY,
+                        username VARCHAR(255),
+                        FOREIGN KEY (username) REFERENCES Users(username)
+                    )
+                """);
 
-            //Games table
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Games (
-                    id INT PRIMARY KEY AUTO_INCREMENT,
-                    gameName VARCHAR(255),
-                    whiteUsername VARCHAR(255),
-                    blackUsername VARCHAR(255),
-                    game TEXT
-                )
-            """);
+                //Games table
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS Games (
+                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        gameName VARCHAR(255),
+                        whiteUsername VARCHAR(255),
+                        blackUsername VARCHAR(255),
+                        game TEXT
+                    )
+                """);
+            }
         } catch (SQLException ex) {
             throw new DataAccessException("Error: failed to configure tables", ex);
         }
