@@ -31,7 +31,7 @@ public class LoginHandler implements Route {
             res.status(200);
             return gson.toJson(result);
 
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             return HandlerUtils.handleException(e, res);
         }
     }

@@ -2,6 +2,7 @@ package server.handler;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import server.util.HandlerUtils;
 import service.LogoutService;
 import spark.Request;
 import spark.Response;
@@ -27,17 +28,8 @@ public class LogoutHandler implements Route {
             res.status(200);
             return "{}";
 
-        } catch (DataAccessException e) {
-            //known errors (e.g., token not found)
-            res.status(401);
-            return new Gson().toJson(new ErrorMessage(e.getMessage()));
-
         } catch (Exception e) {
-            //unexpected errors
-            res.status(500);
-            return new Gson().toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return HandlerUtils.handleException(e, res);
         }
     }
-
-    private record ErrorMessage(String message) {}
 }

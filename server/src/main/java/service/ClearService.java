@@ -10,6 +10,10 @@ public class ClearService {
     }
 
     public void clear() throws DataAccessException {
-        dataAccess.clear();
+        try {
+            dataAccess.clear();
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
     }
 }

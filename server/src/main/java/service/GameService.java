@@ -24,7 +24,14 @@ public class GameService {
 
     public ListGamesResult listGames(String authToken) throws DataAccessException {
         //validate token (like in LogoutService.logout())
-        AuthData auth = dataAccess.getAuth(authToken);
+        AuthData auth;
+        try {
+            auth = dataAccess.getAuth(authToken);
+        } catch (Exception e) {
+            //database failure
+            throw new DataAccessException("Error: internal server error", e);
+        }
+
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
@@ -32,7 +39,15 @@ public class GameService {
         //if above passes, then get gameID, usernames, and gameName
         //from DA method listGames
         List<GameSummary> summaries = new ArrayList<>();
-        for (GameData game : dataAccess.listGames()) {
+        List<GameData> gameList;
+
+        try {
+            gameList = new ArrayList<>(dataAccess.listGames());
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
+
+        for (GameData game : gameList) {
             summaries.add(new GameSummary(
                     game.gameID(),
                     game.whiteUsername(),
@@ -48,7 +63,14 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
         //validate token
-        AuthData auth = dataAccess.getAuth(authToken);
+        AuthData auth;
+        try {
+            auth = dataAccess.getAuth(authToken);
+        } catch (Exception e) {
+            //database failure
+            throw new DataAccessException("Error: internal server error", e);
+        }
+
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
@@ -63,7 +85,11 @@ public class GameService {
 
         //create and insert GameData
         GameData gameData = new GameData(gameID, null,  null, request.gameName(), new ChessGame());
-        dataAccess.insertGame(gameData);
+        try {
+            dataAccess.insertGame(gameData);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
 
         //return success
         return new CreateGameResult(gameID);
@@ -83,15 +109,26 @@ public class GameService {
         }
 
         // Validate authToken
-        AuthData authData = dataAccess.getAuth(authToken);
+        AuthData authData;
+        try {
+            authData = dataAccess.getAuth(authToken);
+        } catch (Exception e) {
+            //database failure
+            throw new DataAccessException("Error: internal server error", e);
+        }
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
         String username = authData.username();
-        System.out.println("Saving username as: " + username);
+        //System.out.println("Saving username as: " + username);
 
         // Get the game from database
-        GameData game = dataAccess.getGame(request.gameID());
+        GameData game;
+        try {
+            game = dataAccess.getGame(request.gameID());
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
         if (game == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -101,12 +138,20 @@ public class GameService {
             if (game.whiteUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            dataAccess.setWhiteUsername(game.gameID(), username);  // update white player
         } else {
             if (game.blackUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
-            dataAccess.setBlackUsername(game.gameID(), username);  // update black player
+        }
+
+        try {
+            if (playerColor == ChessGame.TeamColor.WHITE) {
+                dataAccess.setWhiteUsername(game.gameID(), username);
+            } else {
+                dataAccess.setBlackUsername(game.gameID(), username);
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
         }
     }
 }

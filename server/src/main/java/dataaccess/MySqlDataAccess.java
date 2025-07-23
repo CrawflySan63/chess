@@ -90,7 +90,7 @@ public class MySqlDataAccess implements DataAccess {
             }
             return null;
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to retrieve auth token", e);
+            throw new DataAccessException("Internal server error while fetching auth", e);
         }
     }
 

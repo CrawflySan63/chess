@@ -1,6 +1,7 @@
 package server.handler;
 
 import com.google.gson.Gson;
+import server.util.HandlerUtils;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -29,22 +30,8 @@ public class RegisterHandler implements Route {
             //step 3 set success status and return result
             res.status(200);
             return gson.toJson(result);
-        } catch (DataAccessException e) {
-            //step 4 handle known errors
-            if (e.getMessage().contains("bad request")) {
-                res.status(400);
-            } else if (e.getMessage().contains("already taken")) {
-                res.status(403);
-            } else {
-                res.status(500);
-            }
-            return gson.toJson(new ErrorMessage(e.getMessage()));
         } catch (Exception e) {
-            //step 5 catch unexpected errors
-            res.status(500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return HandlerUtils.handleException(e, res);
         }
     }
-
-    private record ErrorMessage(String message) {}
 }

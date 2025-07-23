@@ -28,7 +28,12 @@ public class UserService {
         }
 
         // Step 2 check if username already exists
-        UserData existingUser = dataAccess.getUser(request.username());
+        UserData existingUser;
+        try {
+            existingUser = dataAccess.getUser(request.username());
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
         if (existingUser != null) {
             throw new DataAccessException("Error: already taken");
         }
@@ -36,12 +41,20 @@ public class UserService {
         // Step 3 create and store new user (with hashed password)
         String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
         UserData newUser = new UserData(request.username(), hashedPassword, request.email());
-        dataAccess.insertUser(newUser);
+        try {
+            dataAccess.insertUser(newUser);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
 
         // Step 4 generate and store auth token
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        dataAccess.insertAuth(authData);
+        try {
+            dataAccess.insertAuth(authData);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
 
         // Step 5 return success
         return new RegisterResult(request.username(), authToken);
@@ -55,15 +68,32 @@ public class UserService {
         }
 
         //step 2 check if password is correct or user not found
-        UserData user = dataAccess.getUser(request.username());
-        if (user == null || !BCrypt.checkpw(request.password(), user.password())) {
+        UserData user;
+        try {
+            user = dataAccess.getUser(request.username());
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
+
+        boolean validPassword;
+        try {
+            validPassword = user != null && BCrypt.checkpw(request.password(), user.password());
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
+
+        if (!validPassword) {
             throw new DataAccessException("Error: unauthorized");
         }
 
         //step 3 create and store auth token
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        dataAccess.insertAuth(authData);
+        try {
+            dataAccess.insertAuth(authData);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
 
         //step 4 return success
         return new LoginResult(request.username(), authToken);

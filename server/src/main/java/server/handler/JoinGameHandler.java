@@ -3,6 +3,7 @@ package server.handler;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import request.JoinGameRequest;
+import server.util.HandlerUtils;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -30,19 +31,7 @@ public class JoinGameHandler implements Route {
             res.status(200);
             return "{}";
         } catch (DataAccessException e) {
-            if (e.getMessage().contains("bad request")) {
-                res.status(400);
-            } else if (e.getMessage().contains("unauthorized")) {
-                res.status(401);
-            } else if (e.getMessage().contains("already taken")) {
-                res.status(403);
-            } else {
-                res.status(500);
-            }
-
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "Error: " + e.getMessage());
-            return gson.toJson(error);
+            return HandlerUtils.handleException(e, res);
         } catch (Exception e) {
             res.status(500);
             return gson.toJson(Map.of("message", "Error: " + e.getMessage()));

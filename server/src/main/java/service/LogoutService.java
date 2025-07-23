@@ -12,11 +12,20 @@ public class LogoutService {
     }
 
     public void logout(String authToken) throws DataAccessException {
-        AuthData auth = dataAccess.getAuth(authToken);
+        AuthData auth;
+        try {
+            auth = dataAccess.getAuth(authToken);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
 
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        dataAccess.deleteAuth(authToken);
+        try {
+            dataAccess.deleteAuth(authToken);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: internal server error", e);
+        }
     }
 }

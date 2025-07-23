@@ -3,6 +3,7 @@ package server.handler;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import result.ListGamesResult;
+import server.util.HandlerUtils;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -28,17 +29,8 @@ public class ListGamesHandler implements Route {
             //return success
             res.status(200);
             return gson.toJson(result);
-
-        } catch (DataAccessException e) {
-            //handle known errors
-            res.status(e.getMessage().contains("unauthorized") ? 401 : 500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
         } catch (Exception e) {
-            //catch unexpected exceptions
-            res.status(500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return HandlerUtils.handleException(e, res);
         }
     }
-
-    private record ErrorMessage(String message) {}
 }
