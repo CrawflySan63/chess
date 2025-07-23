@@ -118,7 +118,10 @@ public class MySqlDataAccess implements DataAccess {
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             stmt.setInt(2, gameID);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DataAccessException("Eerror: GameID not found for white username");
+            }
         } catch (SQLException ex) {
             throw new DataAccessException("Error updating whiteUsername", ex);
         }
@@ -131,7 +134,10 @@ public class MySqlDataAccess implements DataAccess {
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             stmt.setInt(2, gameID);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DataAccessException("Error: Game ID not found for black username");
+            }
         } catch (SQLException ex) {
             throw new DataAccessException("Error updating blackUsername", ex);
         }
