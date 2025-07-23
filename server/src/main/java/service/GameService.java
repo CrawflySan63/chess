@@ -71,50 +71,42 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
-        //validate input (make sure authToken, request and playerColor aren't empty or null
-        if (authToken == null || authToken.isBlank() ||
-                request == null || request.playerColor() == null ||
-                (!(request.playerColor() == ChessGame.TeamColor.WHITE) && !(request.playerColor() == ChessGame.TeamColor.BLACK))) {
+        // Validate input
+        if (authToken == null || authToken.isBlank() || request == null) {
             throw new DataAccessException("Error: bad request");
         }
 
-        //validate authToken (make sure it's in the database)
+        // Validate playerColor
+        ChessGame.TeamColor playerColor = request.playerColor();
+        if (playerColor == null ||
+                (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK)) {
+            throw new DataAccessException("Error: bad request");
+        }
+
+        // Validate authToken
         AuthData authData = dataAccess.getAuth(authToken);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
+        String username = authData.username();
 
-        //validate player color
-        boolean isWhite = request.playerColor() == ChessGame.TeamColor.WHITE;
-        boolean isBlack = request.playerColor() == ChessGame.TeamColor.BLACK;
-
-        //get game
-        GameData oldGame = dataAccess.getGame(request.gameID());
-        if (oldGame == null) {
+        // Get the game from database
+        GameData game = dataAccess.getGame(request.gameID());
+        if (game == null) {
             throw new DataAccessException("Error: bad request");
         }
 
-        //check if the requested color is already taken
-        if (isWhite) {
-            if (oldGame.whiteUsername() != null) {
+        // Check if color is already taken
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            if (game.whiteUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
+            dataAccess.setWhiteUsername(game.gameID(), username);  // ✅ Only update white player
         } else {
-            if (oldGame.blackUsername() != null) {
+            if (game.blackUsername() != null) {
                 throw new DataAccessException("Error: already taken");
             }
+            dataAccess.setBlackUsername(game.gameID(), username);  // ✅ Only update black player
         }
-
-        //create new GameData with updated player
-        GameData newGame = new GameData(
-                oldGame.gameID(),
-                isWhite ? authData.username() : oldGame.whiteUsername(),
-                isBlack ? authData.username() : oldGame.blackUsername(),
-                oldGame.gameName(),
-                oldGame.game()
-        );
-
-        //replace game in DAO
-        dataAccess.replaceGame(newGame);
     }
 }

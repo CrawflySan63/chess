@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import server.handler.*;
 import service.GameService;
 import service.LogoutService;
@@ -15,7 +16,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         //memory-based data store created
-        DataAccess dataAccess = new MemoryDataAccess();
+        //DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = new MySqlDataAccess();
         UserService userService = new UserService(dataAccess);
         LogoutService logoutService = new LogoutService(dataAccess);
         GameService gameService = new GameService(dataAccess);

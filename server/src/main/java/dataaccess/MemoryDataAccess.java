@@ -27,8 +27,23 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void replaceGame(GameData game) throws DataAccessException {
-        games.put(game.gameID(), game);
+    public void setWhiteUsername(int gameID, String username) throws DataAccessException {
+        GameData game = games.get(gameID);
+        if (game == null) {
+            throw new DataAccessException("Game not found");
+        }
+        GameData updated = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+        games.put(gameID, updated);
+    }
+
+    @Override
+    public void setBlackUsername(int gameID, String username) throws DataAccessException {
+        GameData game = games.get(gameID);
+        if (game == null) {
+            throw new DataAccessException("Game not found");
+        }
+        GameData updated = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+        games.put(gameID, updated);
     }
 
     @Override

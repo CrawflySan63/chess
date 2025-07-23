@@ -112,19 +112,28 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void replaceGame(GameData game) throws DataAccessException {
-        var sql = "UPDATE Games SET gameName = ?, whiteUsername = ?, blackUsername = ?, game = ? WHERE id = ?";
+    public void setWhiteUsername(int gameID, String username) throws DataAccessException {
+        var sql = "UPDATE Games SET whiteUsername = ? WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, game.gameName());
-            stmt.setString(2, game.whiteUsername());
-            stmt.setString(3, game.blackUsername());
-            String gameJson = gson.toJson(game.game());
-            stmt.setString(4, gameJson);
-            stmt.setInt(5, game.gameID());
+            stmt.setString(1, username);
+            stmt.setInt(2, gameID);
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to update game", e);
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error updating whiteUsername", ex);
+        }
+    }
+
+    @Override
+    public void setBlackUsername(int gameID, String username) throws DataAccessException {
+        var sql = "UPDATE Games SET blackUsername = ? WHERE id = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setInt(2, gameID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error updating blackUsername", ex);
         }
     }
 
