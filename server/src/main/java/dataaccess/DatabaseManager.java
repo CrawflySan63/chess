@@ -82,12 +82,24 @@ public class DatabaseManager {
      */
     static Connection getConnection() throws DataAccessException {
         try {
-            //do not wrap the following line with a try-with-resources
+            // Attempt to connect using the full connection URL (with DB name)
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: failed to get connection", ex);
+            // If the database doesn't exist, try creating it
+            if (ex.getMessage().toLowerCase().contains("unknown database")) {
+                createDatabase(); // create the DB
+                try {
+                    var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+                    conn.setCatalog(databaseName);
+                    return conn;
+                } catch (SQLException retryEx) {
+                    throw new DataAccessException("Error: failed to connect after creating DB", retryEx);
+                }
+            } else {
+                throw new DataAccessException("Error: failed to get connection", ex);
+            }
         }
     }
 
