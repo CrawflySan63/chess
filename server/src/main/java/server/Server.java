@@ -1,9 +1,6 @@
 package server;
 
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
-import dataaccess.MySqlDataAccess;
+import dataaccess.*;
 import server.handler.*;
 import service.GameService;
 import service.LogoutService;
@@ -13,6 +10,15 @@ import service.UserService;
 public class Server {
 
     public int run(int desiredPort) {
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.configureTables();
+        } catch (DataAccessException e) {
+            System.err.println("Database setup failed: " + e.getMessage());
+            e.printStackTrace();
+            return -1; // signal error
+        }
+
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
