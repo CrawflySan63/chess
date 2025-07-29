@@ -134,8 +134,11 @@ public class TerminalClient {
                         }
 
                         int gameID = games.get(index).gameID();
-                        facade.observeGame(gameID, currentUser.authToken());
-                        System.out.println("Observing game " + gameID);
+                        //facade.observeGame(gameID, currentUser.authToken());
+                        GameData game = facade.getGame(gameID, currentUser.authToken());
+                        ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
+                        display.drawBoard(game.game().getBoard(), color);
+                        System.out.println("Observing game " + games.get(index).gameName());
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid game number. Please enter a valid number.");
                     }

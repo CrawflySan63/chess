@@ -138,17 +138,17 @@ public class ServerFacadeTests {
         Assertions.assertThrows(RuntimeException.class, () -> facade.joinGame(1, ChessGame.TeamColor.WHITE, auth.authToken()));
     }
 
-    @Test
-    public void observeGameSuccess() throws Exception {
-        AuthData auth = facade.register("observer", "pw", "em");
-        GameData game = facade.createGame("Observe Me", auth.authToken());
-        Assertions.assertDoesNotThrow(() -> facade.observeGame(game.gameID(), auth.authToken()));
-    }
-
-    @Test
-    public void observeGameFailWrongGame() throws Exception {
-        AuthData auth = facade.register("user11", "pw11", "email11");
-
-        Assertions.assertThrows(RuntimeException.class, () -> facade.observeGame(1, auth.authToken()));
-    }
+//    @Test
+//    public void observeGameSuccess() throws Exception {
+//        AuthData auth = facade.register("observer", "pw", "em");
+//        GameData game = facade.createGame("Observe Me", auth.authToken());
+//        Assertions.assertDoesNotThrow(() -> facade.observeGame(game.gameID(), auth.authToken()));
+//    }
+//
+//    @Test
+//    public void observeGameFailWrongGame() throws Exception {
+//        AuthData auth = facade.register("user11", "pw11", "email11");
+//
+//        Assertions.assertThrows(RuntimeException.class, () -> facade.observeGame(1, auth.authToken()));
+//    }
 }
