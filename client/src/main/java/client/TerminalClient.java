@@ -22,7 +22,9 @@ public class TerminalClient {
             String line = scanner.nextLine().trim();
             String[] tokens = line.split("\\s+");
 
-            if (tokens.length == 0 || tokens[0].isEmpty()) continue;
+            if (tokens.length == 0 || tokens[0].isEmpty()) {
+                continue;
+            }
 
             String command = tokens[0].toLowerCase();
 
@@ -62,7 +64,9 @@ public class TerminalClient {
                 }
             }
             case "quit" -> quit();
-            default -> System.out.println("Unknown command. Type 'help' for options.");
+            default -> {
+                System.out.println("Unknown command. Type 'help' for options.");
+            }
         }
     }
 
