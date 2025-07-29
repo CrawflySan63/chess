@@ -52,6 +52,16 @@ public class ServerFacade {
         makePutRequest("/game", request, authToken);
     }
 
+    public void clear() throws Exception {
+        URL url = new URL(serverUrl + "/db");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("DELETE");
+
+        if (conn.getResponseCode() != 200) {
+            throw new RuntimeException("Failed to clear database");
+        }
+    }
+
     // Helper methods
 
     private <T> T makePostRequest(String path, Object request, Class<T> responseClass) throws Exception {
