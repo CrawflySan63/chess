@@ -72,7 +72,9 @@ public class TerminalClient {
 
     private void handleLoggedIn(String command, String[] tokens) throws Exception {
         switch (command) {
-            case "help" -> showLoggedInHelp();
+            case "help" -> {
+                showLoggedInHelp();
+            }
             case "create" -> {
                 if (tokens.length != 2) {
                     System.out.println("Usage: create <name>");
