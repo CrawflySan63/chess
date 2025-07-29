@@ -47,11 +47,6 @@ public class ServerFacade {
         makePutRequest("/game", request, authToken);
     }
 
-//    public void observeGame(int gameID, String authToken) throws Exception {
-//        JoinGameRequest request = new JoinGameRequest(null, gameID);
-//        makePutRequest("/game", request, authToken);
-//    }
-
     public void clear() throws Exception {
         URL url = new URL(serverUrl + "/db");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
