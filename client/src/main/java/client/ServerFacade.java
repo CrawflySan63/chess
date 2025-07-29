@@ -74,7 +74,9 @@ public class ServerFacade {
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
-        if (authToken != null) conn.setRequestProperty("Authorization", authToken);
+        if (authToken != null) {
+            conn.setRequestProperty("Authorization", authToken);
+        }
 
         try (OutputStream os = conn.getOutputStream()) {
             os.write(gson.toJson(request).getBytes());
