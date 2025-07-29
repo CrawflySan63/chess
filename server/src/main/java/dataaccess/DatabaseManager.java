@@ -39,7 +39,7 @@ public class DatabaseManager {
                 //users table
                 stmt.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS users (
-                        username VARCHAR(255) PRIMARY KEY,
+                        username VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL PRIMARY KEY,
                         password VARCHAR(255) NOT NULL,
                         email VARCHAR(255)
                     )
@@ -49,7 +49,7 @@ public class DatabaseManager {
                 stmt.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS authtokens (
                         authToken VARCHAR(255) PRIMARY KEY,
-                        username VARCHAR(255),
+                        username VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
                         FOREIGN KEY (username) REFERENCES users(username)
                     )
                 """);
@@ -66,6 +66,8 @@ public class DatabaseManager {
                 """);
             }
         } catch (SQLException ex) {
+            System.out.println("SQL Error: " + ex.getMessage());
+            ex.printStackTrace(); // ADD THIS
             throw new DataAccessException("Error: failed to configure tables", ex);
         }
     }
