@@ -65,11 +65,6 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
 
-        ChessGame.TeamColor playerColor = request.playerColor();
-        if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK) {
-            throw new DataAccessException("Error: bad request");
-        }
-
         AuthData authData = dataAccess.getAuth(authToken);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
@@ -79,6 +74,13 @@ public class GameService {
         GameData game = dataAccess.getGame(request.gameID());
         if (game == null) {
             throw new DataAccessException("Error: bad request");
+        }
+
+        ChessGame.TeamColor playerColor = request.playerColor();
+
+        //if null, observer joins, so no update to game is required
+        if (playerColor == null) {
+            return;
         }
 
         // Check if color is already taken
