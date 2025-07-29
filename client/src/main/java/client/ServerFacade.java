@@ -62,6 +62,16 @@ public class ServerFacade {
         }
     }
 
+    public GameData getGame(int gameID, String authToken) throws Exception {
+        List<GameSummary> games = listGames(authToken);
+        for (GameSummary summary : games) {
+            if (summary.gameID() == gameID) {
+                return new GameData(summary.gameID(), summary.whiteUsername(), summary.blackUsername(), summary.gameName(), new ChessGame());
+            }
+        }
+        throw new RuntimeException("Game not found");
+    }
+
     // Helper methods
 
     private <T> T makePostRequest(String path, Object request, Class<T> responseClass) throws Exception {
@@ -83,7 +93,11 @@ public class ServerFacade {
         }
 
         if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Error: " + conn.getResponseCode());
+            try (InputStream errorStream = conn.getErrorStream()) {
+                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
+                String message = error.getOrDefault("message", "Unknown error");
+                throw new RuntimeException(message);
+            }
         }
 
         try (InputStream is = conn.getInputStream()) {
@@ -104,7 +118,11 @@ public class ServerFacade {
         }
 
         if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Error: " + conn.getResponseCode());
+            try (InputStream errorStream = conn.getErrorStream()) {
+                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
+                String message = error.getOrDefault("message", "Unknown error");
+                throw new RuntimeException(message);
+            }
         }
     }
 
@@ -115,7 +133,11 @@ public class ServerFacade {
         conn.setRequestProperty("Authorization", authToken);
 
         if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Error: " + conn.getResponseCode());
+            try (InputStream errorStream = conn.getErrorStream()) {
+                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
+                String message = error.getOrDefault("message", "Unknown error");
+                throw new RuntimeException(message);
+            }
         }
     }
 
@@ -126,7 +148,11 @@ public class ServerFacade {
         conn.setRequestProperty("Authorization", authToken);
 
         if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Error: " + conn.getResponseCode());
+            try (InputStream errorStream = conn.getErrorStream()) {
+                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
+                String message = error.getOrDefault("message", "Unknown error");
+                throw new RuntimeException(message);
+            }
         }
 
         try (InputStream is = conn.getInputStream()) {

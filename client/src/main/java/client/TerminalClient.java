@@ -2,12 +2,18 @@ package client;
 
 import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
+import result.GameSummary;
+import ui.ChessBoardDisplay;
+
 import java.util.*; //using .Scanner a lot to read user input from terminal
 
 public class TerminalClient {
     private final ServerFacade facade;
     private final Scanner scanner = new Scanner(System.in);
     private AuthData currentUser = null;
+    private final ChessBoardDisplay display = new ChessBoardDisplay();
+    private List<GameSummary> lastGameList = new ArrayList<>();
 
     public TerminalClient(ServerFacade facade) {
         this.facade = facade;
@@ -84,29 +90,55 @@ public class TerminalClient {
                 }
             }
             case "list" -> {
-                var games = facade.listGames(currentUser.authToken());
-                for (var g : games) {
-                    System.out.printf("ID: %d | Name: %s | White: %s | Black: %s%n",
-                            g.gameID(), g.gameName(), g.whiteUsername(), g.blackUsername());
+                lastGameList = facade.listGames(currentUser.authToken());
+                int index = 1;
+                for (var g : lastGameList) {
+                    System.out.printf("%d. Name: %s | White: %s | Black: %s%n",
+                            index++, g.gameName(), g.whiteUsername(), g.blackUsername());
                 }
             }
             case "join" -> {
                 if (tokens.length != 3) {
                     System.out.println("Usage: join <ID> [WHITE|BLACK]");
                 } else {
-                    int id = Integer.parseInt(tokens[1]);
-                    ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(tokens[2].toUpperCase());
-                    facade.joinGame(id, color, currentUser.authToken());
-                    System.out.println("Joined game as " + color);
+                    try {
+                        int index = Integer.parseInt(tokens[1]) - 1;
+                        if (index < 0 || index >= lastGameList.size()) {
+                            System.out.println("Invalid game number. Please enter a valid number.");
+                        } else {
+                            int gameID = lastGameList.get(index).gameID();
+                            ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(tokens[2].toUpperCase());
+                            facade.joinGame(gameID, color, currentUser.authToken());
+                            GameData game = facade.getGame(gameID, currentUser.authToken());
+                            display.drawBoard(game.game().getBoard(), color);
+                            System.out.println("Joined game as " + color);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid game number. Please enter a valid number.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid color. Use WHITE or BLACK.");
+                    }
                 }
             }
             case "observe" -> {
                 if (tokens.length != 2) {
-                    System.out.println("Usage: observe <ID>");
+                    System.out.println("Usage: observe <NUMBER>");
                 } else {
-                    int id = Integer.parseInt(tokens[1]);
-                    facade.observeGame(id, currentUser.authToken());
-                    System.out.println("Observing game " + id);
+                    try {
+                        int index = Integer.parseInt(tokens[1]) - 1;
+
+                        List<GameSummary> games = facade.listGames(currentUser.authToken());
+                        if (index < 0 || index >= games.size()) {
+                            System.out.println("Invalid game number.");
+                            return;
+                        }
+
+                        int gameID = games.get(index).gameID();
+                        facade.observeGame(gameID, currentUser.authToken());
+                        System.out.println("Observing game " + gameID);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid game number. Please enter a valid number.");
+                    }
                 }
             }
             case "logout" -> {
