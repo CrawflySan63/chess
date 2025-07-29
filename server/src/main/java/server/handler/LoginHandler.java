@@ -1,7 +1,6 @@
 package server.handler;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import request.LoginRequest;
 import result.LoginResult;
 import service.UserService;
