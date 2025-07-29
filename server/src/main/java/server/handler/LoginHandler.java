@@ -21,7 +21,7 @@ public class LoginHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws Exception {
         try {
-            //step 1 parse rquest JSON into RegisterRequest object
+            //step 1 parse request JSON into RegisterRequest object
             LoginRequest loginRequest = gson.fromJson(req.body(), LoginRequest.class);
 
             //step 2 call the service
