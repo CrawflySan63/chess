@@ -76,6 +76,59 @@ public class TerminalClient {
         }
     }
 
+    private void handleJoin(String[] tokens) {
+        if (tokens.length != 3) {
+            System.out.println("Usage: join <ID> [WHITE|BLACK]");
+            return;
+        }
+
+        try {
+            int index = Integer.parseInt(tokens[1]) - 1;
+            if (index < 0 || index >= lastGameList.size()) {
+                System.out.println("Invalid game number. Please enter a valid number.");
+                return;
+            }
+
+            int gameID = lastGameList.get(index).gameID();
+            ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(tokens[2].toUpperCase());
+            facade.joinGame(gameID, color, currentUser.authToken());
+            GameData game = facade.getGame(gameID, currentUser.authToken());
+            display.drawBoard(game.game().getBoard(), color);
+            System.out.println("Joined game as " + color);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid game number. Please enter a valid number.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid color. Use WHITE or BLACK.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void handleObserve(String[] tokens) {
+        if (tokens.length != 2) {
+            System.out.println("Usage: observe <NUMBER>");
+            return;
+        }
+
+        try {
+            int index = Integer.parseInt(tokens[1]) - 1;
+            List<GameSummary> games = facade.listGames(currentUser.authToken());
+            if (index < 0 || index >= games.size()) {
+                System.out.println("Invalid game number.");
+                return;
+            }
+
+            int gameID = games.get(index).gameID();
+            GameData game = facade.getGame(gameID, currentUser.authToken());
+            display.drawBoard(game.game().getBoard(), ChessGame.TeamColor.WHITE);
+            System.out.println("Observing game " + games.get(index).gameName());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid game number. Please enter a valid number.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
     private void handleLoggedIn(String command, String[] tokens) throws Exception {
         switch (command) {
             case "help" -> {
@@ -97,53 +150,8 @@ public class TerminalClient {
                             index++, g.gameName(), g.whiteUsername(), g.blackUsername());
                 }
             }
-            case "join" -> {
-                if (tokens.length != 3) {
-                    System.out.println("Usage: join <ID> [WHITE|BLACK]");
-                } else {
-                    try {
-                        int index = Integer.parseInt(tokens[1]) - 1;
-                        if (index < 0 || index >= lastGameList.size()) {
-                            System.out.println("Invalid game number. Please enter a valid number.");
-                        } else {
-                            int gameID = lastGameList.get(index).gameID();
-                            ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(tokens[2].toUpperCase());
-                            facade.joinGame(gameID, color, currentUser.authToken());
-                            GameData game = facade.getGame(gameID, currentUser.authToken());
-                            display.drawBoard(game.game().getBoard(), color);
-                            System.out.println("Joined game as " + color);
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid game number. Please enter a valid number.");
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid color. Use WHITE or BLACK.");
-                    }
-                }
-            }
-            case "observe" -> {
-                if (tokens.length != 2) {
-                    System.out.println("Usage: observe <NUMBER>");
-                } else {
-                    try {
-                        int index = Integer.parseInt(tokens[1]) - 1;
-
-                        List<GameSummary> games = facade.listGames(currentUser.authToken());
-                        if (index < 0 || index >= games.size()) {
-                            System.out.println("Invalid game number.");
-                            return;
-                        }
-
-                        int gameID = games.get(index).gameID();
-                        //facade.observeGame(gameID, currentUser.authToken());
-                        GameData game = facade.getGame(gameID, currentUser.authToken());
-                        ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
-                        display.drawBoard(game.game().getBoard(), color);
-                        System.out.println("Observing game " + games.get(index).gameName());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid game number. Please enter a valid number.");
-                    }
-                }
-            }
+            case "join" -> { handleJoin(tokens); }
+            case "observe" -> { handleObserve(tokens); }
             case "logout" -> {
                 facade.logout(currentUser.authToken());
                 currentUser = null;
