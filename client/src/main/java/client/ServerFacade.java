@@ -83,20 +83,28 @@ public class ServerFacade {
             conn.setRequestProperty("Authorization", authToken);
         }
 
+        handlePostPutError(request, conn);
+
+        try (InputStream is = conn.getInputStream()) {
+            return gson.fromJson(new InputStreamReader(is), responseClass);
+        }
+    }
+
+    private void handlePostPutError(Object request, HttpURLConnection conn) throws IOException {
         try (OutputStream os = conn.getOutputStream()) {
             os.write(gson.toJson(request).getBytes());
         }
 
+        ifNot200Error(conn);
+    }
+
+    private void ifNot200Error(HttpURLConnection conn) throws IOException {
         if (conn.getResponseCode() != 200) {
             try (InputStream errorStream = conn.getErrorStream()) {
                 Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
                 String message = error.getOrDefault("message", "Unknown error");
                 throw new RuntimeException(message);
             }
-        }
-
-        try (InputStream is = conn.getInputStream()) {
-            return gson.fromJson(new InputStreamReader(is), responseClass);
         }
     }
 
@@ -108,47 +116,27 @@ public class ServerFacade {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", authToken);
 
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(gson.toJson(request).getBytes());
-        }
-
-        if (conn.getResponseCode() != 200) {
-            try (InputStream errorStream = conn.getErrorStream()) {
-                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
-                String message = error.getOrDefault("message", "Unknown error");
-                throw new RuntimeException(message);
-            }
-        }
+        handlePostPutError(request, conn);
     }
 
     private void makeDeleteRequest(String path, String authToken) throws Exception {
         URL url = new URL(serverUrl + path);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("DELETE");
+        handleDeleteGetError(authToken, conn);
+    }
+
+    private void handleDeleteGetError(String authToken, HttpURLConnection conn) throws IOException {
         conn.setRequestProperty("Authorization", authToken);
 
-        if (conn.getResponseCode() != 200) {
-            try (InputStream errorStream = conn.getErrorStream()) {
-                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
-                String message = error.getOrDefault("message", "Unknown error");
-                throw new RuntimeException(message);
-            }
-        }
+        ifNot200Error(conn);
     }
 
     private <T> T makeGetRequest(String path, Class<T> responseClass, String authToken) throws Exception {
         URL url = new URL(serverUrl + path);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", authToken);
-
-        if (conn.getResponseCode() != 200) {
-            try (InputStream errorStream = conn.getErrorStream()) {
-                Map<String, String> error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
-                String message = error.getOrDefault("message", "Unknown error");
-                throw new RuntimeException(message);
-            }
-        }
+        handleDeleteGetError(authToken, conn);
 
         try (InputStream is = conn.getInputStream()) {
             return gson.fromJson(new InputStreamReader(is), responseClass);
