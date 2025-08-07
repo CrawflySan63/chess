@@ -35,7 +35,7 @@ public class ChessBoardDisplay {
             ChessPiece piece = board.getPiece(pos);
             boolean lightSquare = (row + col) % 2 == 0;
 
-            System.out.print(lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY);
+            System.out.print(lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY);
             System.out.print(SET_TEXT_COLOR_WHITE);
 
             if (piece == null) {
@@ -50,9 +50,9 @@ public class ChessBoardDisplay {
     }
 
     private void drawColumnLabels(boolean leftToRight) {
-        System.out.print("    ");
+        System.out.print(" \u2003");
         for (char col = leftToRight ? 'a' : 'h'; leftToRight ? col <= 'h' : col >= 'a'; col += leftToRight ? 1 : -1) {
-            System.out.print(" " + col + " ");
+            System.out.print("\u2003" + col + " ");
         }
         System.out.println();
     }
